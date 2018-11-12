@@ -26,7 +26,6 @@ for date in datelist:
     #pass code to beatufulsoup tool
     html = bs(str(browser.parsed), 'html.parser')
   
-
     hourlyTable = html.find('table',attrs={'class':'list hours responsive'})
     tableBody = hourlyTable.find('tbody')
     rows = tableBody.find_all('tr')
