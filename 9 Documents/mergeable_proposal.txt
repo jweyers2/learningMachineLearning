@@ -1,4 +1,4 @@
-1. Suitable Title - Should reflect the business and analytic goals
+﻿1. Suitable Title - Should reflect the business and analytic goals
 Examining opportunities of the participation in sequential markets and finding the optimal balance for it
 
 2. Business Goal:
@@ -15,15 +15,12 @@ Identifying whether participation in the intra-day auction is viable and, if it 
 
 3. Analytics/Data Mining Goal:
 (a) A description of the analytics objective.
-Identify parameters responsible for the price difference between the day-ahead and intra-day auctions. Develop a regression model based on these parameters
-(b) Is this a supervised or unsupervised task?
-Supervised (price data is available)
-Is it predictive or descriptive?
-First part is descriptive, second part is predictive
-Is it retrospective or forward-looking?
-Both parts are retrospective, however the regression model can be used for prospective predictions too (assuming the utilized paremeters’ data is available at the point of prediction)
+Accordingly to the issue description of the analytics objective it is necessary to identify parameters which are responsible for the existing price difference between the day-ahead and intraday auctions. Based on these parameters it would be needful to develop a regression model to emphasize this issue in a graphical way.
+(b) Is this a supervised or unsupervised task? Is it predictive or descriptive? Is it retrospective or forward-looking?
+Futhermore this task is supervised. The reason in order to that is the available price data. The first part of the regression is obviously descriptive, but the second part can not exactly be estimated. It is predictive and things with a predictive character are never exact. Both parts are also retrospective. But the regression model can additionally used for prospective predictions, required the utilized parameters data is available at the point of prediction.
 (c) What is the main outcome variable(s) of interest?
-One or several parameters which have a causal relationship with the prices at both auctions and the kind of their relationship
+In term of the main outcome variables it is important to consider several parameters which have a causal relationship with the prices at both auctions and the kind of their relationship.
+
 4. Data:
 (a) Brief description of available data.
 The dataset to be examined shall include volume (in MWh) and price (in €/MWh) of the energy sold at each auction sale. For the day-ahead auction the data is provided in hourly-, for the intraday auction in 15-minute resolution. As a whole the dataset encompasses 731 days, so two years, which results in 17544 data points for the day-ahead data and 70176 data points for the intraday auction data of the year 2016 and 2017.
