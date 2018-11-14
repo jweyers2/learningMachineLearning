@@ -28,42 +28,47 @@ browser.open(url)
 form = browser.get_forms('date_selector')
 
 hours = []
-hourlyPrices = []
-hourlyConsumption = []
+quarterhourlyPrices = []
+quarterhourlyConsumption = []
 # df  =pd.DataFrame(columns=['datetime','price','consumption'])
 for date in datelist:
     # print(date.strftime("%d.%m.%Y"))
-    form[0]['EPEXSpotMarketData-show_auction[date]'].value=date.strftime('%d.%m.%Y')
+    form[0]['EPEXSpotMarketData-show_quarter_auction[date]'].value=date.strftime('%d.%m.%Y')
     #Submit form
     browser.submit_form(form[0])
 
     
-    for h in range(0,23,1):
-        link = browser.find('a',attrs={'id':'val_01'})[0]
-        browser.follow_link(link)
-        #pass code to beatufulsoup tool
-        html = bs(str(browser.parsed), 'html.parser')
-        hourlyTable = html.find('table',attrs={'class':'list hours responsive'})
-        for m in quarterhours:
-            tableBody = hourlyTable.find('tbody')
-            rows = tableBody.find_all('tr')
-            count = 0
-            for row in rows:
-                columns = row.find_all('td')
-                if columns:
-                    if count % 2 == 0:
-                        s = int(columns[0].text.strip()[-1:])
-                        hours.append(pd.datetime(date.year,date.month,date.day,h,s))
-                        hourlyPrices.append(columns[9].text)
-                    else:
-                        hourlyConsumption.append(columns[9].text)
-                        
-                    count += 1
-            
-            iteration = date - startdate
-            iteration = iteration.days
-            print("Iteration: " + str(iteration) + " scraped Date: " + str(date))
-            if iteration % 30 == 0:
-                saveToCSV(startdate,hours,hourlyPrices,hourlyConsumption,outputPath)
+    # hourLinkId = 'val_' + str('%0.2d' %(h))
+    #pass code to beatufulsoup tool
+    html = bs(str(browser.parsed), 'html.parser')
+    hourlyTable = html.find('table',attrs={'class':'list hours responsive'})
+    
+    tableBody = hourlyTable.find('tbody')
+    rows = tableBody.find_all('tr')
+    count = 0
+    for row in rows:
+        columns = row.find_all('td')
+        # print(row)
+        if rows.index(row) == 0:
+            continue
+        # h = row['class'][-2:]
+        h = int(row['class'][1][-2:])-1
+        # print(h)
+        if columns:
+            if count % 2 == 0:
+                # s = int(columns[0].text.strip()[-1:])
+                s_index = int((count/2) % 4)
+                s = quarterhours[s_index]
+                hours.append(pd.datetime(date.year,date.month,date.day,h,s))
+                quarterhourlyPrices.append(columns[8].text)
+            else:
+                quarterhourlyConsumption.append(columns[8].text)
+            count += 1
+    
+    iteration = date - startdate
+    iteration = iteration.days
+    print("Iteration: " + str(iteration) + " scraped Date: " + str(date))
+    if iteration % 30 == 0:
+        saveToCSV(startdate,hours,quarterhourlyPrices,quarterhourlyConsumption,outputPath)
 
-saveToCSV(startdate,iteration,hourlyPrices,hourlyConsumption,outputPath)
+saveToCSV(startdate,iteration,quarterhourlyPrices,quarterhourlyConsumption,outputPath)
