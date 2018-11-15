@@ -30,7 +30,6 @@ form = browser.get_forms('date_selector')
 hours = []
 quarterhourlyPrices = []
 quarterhourlyConsumption = []
-# df  =pd.DataFrame(columns=['datetime','price','consumption'])
 for date in datelist:
     # print(date.strftime("%d.%m.%Y"))
     form[0]['EPEXSpotMarketData-show_quarter_auction[date]'].value=date.strftime('%d.%m.%Y')
@@ -38,7 +37,6 @@ for date in datelist:
     browser.submit_form(form[0])
 
     
-    # hourLinkId = 'val_' + str('%0.2d' %(h))
     #pass code to beatufulsoup tool
     html = bs(str(browser.parsed), 'html.parser')
     hourlyTable = html.find('table',attrs={'class':'list hours responsive'})
@@ -51,12 +49,10 @@ for date in datelist:
         # print(row)
         if rows.index(row) == 0:
             continue
-        # h = row['class'][-2:]
-        h = int(row['class'][1][-2:])-1
+        h = int("".join(filter(str.isdigit,row['class'][1][-2:])))-1
         # print(h)
         if columns:
             if count % 2 == 0:
-                # s = int(columns[0].text.strip()[-1:])
                 s_index = int((count/2) % 4)
                 s = quarterhours[s_index]
                 hours.append(pd.datetime(date.year,date.month,date.day,h,s))
