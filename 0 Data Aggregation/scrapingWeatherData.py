@@ -10,45 +10,8 @@ url = 'https://www.weatheronline.de/Deutschland/Berlin.htm'
 startdate = pd.datetime(2016, 1, 1, 0)
 datelist = pd.date_range(startdate, periods=24, freq='M').tolist()
 # Define the path where to save the scraped Data
-outputPath = './00 Data/weatherData.csv'
-
-#  SAVE LIST To CSV METHOD:
-def saveToCSV(path, months, dailyTempAvg, dailyTempMax, dailyTempMin, numberFreezingDays, numberIcyDays,
-              monthlyRainVolume, numberRainyDays, dailySunnyHoursAvg, monthlyWindSpeedAvg, monthlySnowyDays,
-              dailySnowVolumeAvg):
-    df  =pd.DataFrame(columns=['datetime', 'dailyTempAvg(Celsius)', 'dailyTempMax(Celsius)', 'dailyTempMin(Celsius)',
-                               'numberFreezingDays', 'numberIcyDays', 'monthlyRainVolume(mm)', 'numberRainyDays',
-                               'dailySunnyHoursAvg', 'monthlyWindSpeedAvg(km/h)', 'monthlySnowyDays',
-                               'dailySnowVolumeAvg(cm)'])
-    df['datetime'] = months
-    df['dailyTempAvg(Celsius)'] = dailyTempAvg
-    df['dailyTempMax(Celsius)'] = dailyTempMax
-    df['dailyTempMin(Celsius)'] = dailyTempMin
-    df['numberFreezingDays'] = numberFreezingDays
-    df['numberIcyDays'] = numberIcyDays
-    df['monthlyRainVolume(mm)'] = monthlyRainVolume
-    df['numberRainyDays'] = numberRainyDays
-    df['dailySunnyHoursAvg'] = dailySunnyHoursAvg
-    df['monthlyWindSpeedAvg(km/h)'] = monthlyWindSpeedAvg
-    df['monthlySnowyDays'] = monthlySnowyDays
-    df['dailySnowVolumeAvg(cm)'] = dailySnowVolumeAvg
-    df.to_csv(path, index=False, sep=',')
-
-
-months = []
-dailyTempAvg = []
-dailyTempMax = []
-dailyTempMin = []
-numberFreezingDays = []
-numberIcyDays = []
-monthlyRainVolume = []
-numberRainyDays = []
-dailySunnyHoursAvg = []
-monthlyWindSpeedAvg = []
-monthlySnowyDays = []
-dailySnowVolumeAvg = []
-
-towns = []
+outputPath = './00 Data/aggregatedWeatherData.csv'
+outputPathMonthly = './00 Data/weatherDataMonthly/'
 # Spalten mit Umlauten werden benötigt um beim Scrapen die HTML Elemente zu finden
 weatherCategories = ['Temperatur', 'Tageshöchsttemperatur', 'Nächtl. Tiefsttemperatur', 'Frosttage', 'Eistage',
                      'Niederschlagsmenge', 'Niederschlagstage', 'Sonnenstunden pro Tag', 'Windstärke', 'Schneetage',
@@ -76,6 +39,29 @@ def calcYearList(dateList):
     return yearlist
 
 
+def getCurrentYearSubset(datelist, year):
+    subset = []
+    for date in datelist:
+        if date.strftime('%Y')==year:
+            subset.append(date)
+    return subset
+
+def getAvgMonthlyValues(monthDataFrame, timestamp):
+    temp = ((monthDataFrame['Temperatur']*monthDataFrame['dataAvailability1']).sum)/((monthDataFrame['Temperatur']*monthDataFrame['dataAvailability1']).count)
+    tempMax = ((monthDataFrame['Tageshoechsttemperatur']*monthDataFrame['dataAvailability2']).sum)/((monthDataFrame['Tageshoechsttemperatur']*monthDataFrame['dataAvailability2']).count)
+    tempMin = ((monthDataFrame['Naechtl. Tiefsttemperatur']*monthDataFrame['dataAvailability3']).sum)/((monthDataFrame['Naechtl. Tiefsttemperatur']*monthDataFrame['dataAvailability3']).count)
+    fDays = ((monthDataFrame['Frosttage']*monthDataFrame['dataAvailability4']).sum)/((monthDataFrame['Frosttage']*monthDataFrame['dataAvailability4']).count)
+    iDays = ((monthDataFrame['Eistage']*monthDataFrame['dataAvailability5']).sum)/((monthDataFrame['Eistage']*monthDataFrame['dataAvailability5']).count)
+    rainVolume = ((monthDataFrame['Niederschlagsmenge']*monthDataFrame['dataAvailability6']).sum)/((monthDataFrame['Niederschlagsmenge']*monthDataFrame['dataAvailability6']).count)
+    rDays = ((monthDataFrame['Niederschlagstage']*monthDataFrame['dataAvailability7']).sum)/((monthDataFrame['Niederschlagstage']*monthDataFrame['dataAvailability7']).count)
+    sHours = ((monthDataFrame['Sonnenstunden pro Tag']*monthDataFrame['dataAvailability8']).sum)/((monthDataFrame['Sonnenstunden pro Tag']*monthDataFrame['dataAvailability8']).count)
+    wSpeed = ((monthDataFrame['Windstaerke']*monthDataFrame['dataAvailability9']).sum)/((monthDataFrame['Windstaerke']*monthDataFrame['dataAvailability9']).count)
+    sDays = ((monthDataFrame['Schneetage']*monthDataFrame['dataAvailability10']).sum)/((monthDataFrame['Schneetage']*monthDataFrame['dataAvailability10']).count)
+    sVolume = ((monthDataFrame['Schneehoehen']*monthDataFrame['dataAvailability11']).sum)/((monthDataFrame['Schneehoehen']*monthDataFrame['dataAvailability11']).count)
+    aggregatedData = [timestamp, temp, tempMax, tempMin, fDays, iDays, rainVolume, rDays, sHours, wSpeed, sDays, sVolume]
+    return aggregatedData
+
+
 # Schritt 2: Importiere die Wetterdaten
 # Herangehensweise: Iteriere über (1) Monate, (2) Wetterkategorien, (3) Städte. Für jeden Monat befülle ein
 # DataFrame (mit den Wetterkategorien als Spalten und Städten als Zeilen). Berechne für alle Wetterkategorien in diesem
@@ -86,16 +72,50 @@ yearlist = calcYearList(datelist)
 browser = RoboBrowser(history=True)
 browser.open(url)
 townList = browser.find(class_="scroll_c1_r").findChildren("ul", recursive=False)
-for date in datelist:
-    month = date.strftime('%m')
-    year = date.strftime('%Y')
-    monthInput = monthInputs.get(month)
-    townIndex = 0
-    monthData = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+result = pd.DataFrame(columns=['datetime', 'dailyTempAvg(Celsius)', 'dailyTempMax(Celsius)', 'dailyTempMin(Celsius)',
+                               'numberFreezingDays', 'numberIcyDays', 'monthlyRainVolume(mm)', 'numberRainyDays',
+                               'dailySunnyHoursAvg', 'monthlyWindSpeedAvg(km/h)', 'monthlySnowyDays',
+                               'dailySnowVolumeAvg(cm)'])
+for year in yearlist:
+    monthDataJan = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataFeb = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataMar = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataApr = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataMay = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataJun = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataJul = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataAug = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataSep = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataOct = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataNov = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    monthDataDec = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
+    currentYearsMonths = getCurrentYearSubset(datelist, year)
     for ul in townList:
         for child in ul.findAll('li', recursive=False):
-            newRow = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None, None,
-                      None, None, None, None, None, None, None, None, None, None]
+            newTownJan = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownFeb = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownMar = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownApr = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownMay = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownJun = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownJul = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownAug = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownSep = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownOct = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownNov = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
+            newTownDec = [cleanTownName(child.text), None, None, None, None, None, None, None, None, None, None, None,
+                          None, None, None, None, None, None, None, None, None, None, None]
             linkTown = child.find('a', recursive=False).attrs['href']
             # testprint
             print(cleanTownName(child.text))
@@ -103,12 +123,12 @@ for date in datelist:
             linkKlima = browser.find('a', class_=lambda x: x != 'men1Link' and x != 'inactive', href=True, text='Klima')
             if linkKlima is not None:
                 browser.open(linkKlima.attrs['href'])
-                linkKlimaRechner = browser.find('a', href=True, text='Klimarechner')
+                linkKlimaRechner = browser.find('a', href=True, text='Klimarechner', class_=lambda x: x != 'inactive')
                 if linkKlimaRechner is not None:
                     browser.open(linkKlimaRechner.attrs['href'])
                     form = browser.get_form(action='/weather/maps/city')
-                    form.fields['FMM'].value = monthInput
-                    form.fields['LMM'].value = monthInput
+                    form.fields['FMM'].value = '1'
+                    form.fields['LMM'].value = '12'
                     form.fields['FYY'].value = year
                     form.fields['LYY'].value = year
                     browser.submit_form(form)
@@ -118,18 +138,76 @@ for date in datelist:
                         if catLink is not None:
                             browser.open('https://www.weatheronline.de' + catLink.attrs['href'])
                             tables = browser.find_all('table', class_='gr1')
-                            if len(tables)>0:
-                                table = None
-                                if int(monthInput) < 7:
-                                    table = tables[0]
-                                else:
-                                    table = tables[1]
-                                value = table.findChild('tr').contents[15].contents[(int(monthInput)*2)-1].contents[0].text
-                                dataAvailability = table.findChild('tr').contents[17].contents[(int(monthInput)*2)-1].text
-                                # todo: check if value is provided
-                                if dataAvailability is not 0:
-                                    newRow[(2 * catIndex) - 1] = value
-                                    newRow[(2 * catIndex)] = dataAvailability
+                            if len(tables) > 0:
+                                for i in range(1, len(currentYearsMonths)):
+                                    table = None
+                                    j = i
+                                    value = 0
+                                    dataAvailability = 0
+                                    if i < 7:
+                                        table = tables[0]
+                                        value = table.findChild('tr').contents[15].contents[(j * 2) - 1].contents[0].text
+                                        dataAvailability = table.findChild('tr').contents[17].contents[(j * 2) - 1].text
+                                    else:
+                                        table = tables[1]
+                                        j -= 6
+                                        value = table.contents[0].contents[3].contents[(j * 2) - 1].contents[0].text
+                                        dataAvailability = table.contents[0].contents[5].contents[(j * 2) - 1].text
+                                    if dataAvailability is not 0:
+                                        if i == 1:
+                                            newTownJan[(2 * catIndex) - 1] = value
+                                            newTownJan[(2 * catIndex)] = dataAvailability
+                                        elif i == 2:
+                                            newTownFeb[(2 * catIndex) - 1] = value
+                                            newTownFeb[(2 * catIndex)] = dataAvailability
+                                        elif i == 3:
+                                            newTownMar[(2 * catIndex) - 1] = value
+                                            newTownMar[(2 * catIndex)] = dataAvailability
+                                        elif i == 4:
+                                            newTownApr[(2 * catIndex) - 1] = value
+                                            newTownApr[(2 * catIndex)] = dataAvailability
+                                        elif i == 5:
+                                            newTownMay[(2 * catIndex) - 1] = value
+                                            newTownMay[(2 * catIndex)] = dataAvailability
+                                        elif i == 6:
+                                            newTownJun[(2 * catIndex) - 1] = value
+                                            newTownJun[(2 * catIndex)] = dataAvailability
+                                        elif i == 7:
+                                            newTownJul[(2 * catIndex) - 1] = value
+                                            newTownJul[(2 * catIndex)] = dataAvailability
+                                        elif i == 8:
+                                            newTownAug[(2 * catIndex) - 1] = value
+                                            newTownAug[(2 * catIndex)] = dataAvailability
+                                        elif i == 9:
+                                            newTownSep[(2 * catIndex) - 1] = value
+                                            newTownSep[(2 * catIndex)] = dataAvailability
+                                        elif i == 10:
+                                            newTownOct[(2 * catIndex) - 1] = value
+                                            newTownOct[(2 * catIndex)] = dataAvailability
+                                        elif i == 11:
+                                            newTownNov[(2 * catIndex) - 1] = value
+                                            newTownNov[(2 * catIndex)] = dataAvailability
+                                        elif i == 12:
+                                            newTownDec[(2 * catIndex) - 1] = value
+                                            newTownDec[(2 * catIndex)] = dataAvailability
                         catIndex += 1
-            monthData.loc[len(monthData)] = newRow
-            townIndex += 1
+            monthDataJan.loc[len(monthDataJan)] = newTownJan
+            monthDataFeb.loc[len(monthDataFeb)] = newTownFeb
+            monthDataMar.loc[len(monthDataMar)] = newTownMar
+            monthDataApr.loc[len(monthDataApr)] = newTownApr
+            monthDataMay.loc[len(monthDataMay)] = newTownMay
+            monthDataJun.loc[len(monthDataJun)] = newTownJun
+            monthDataJul.loc[len(monthDataJul)] = newTownJul
+            monthDataAug.loc[len(monthDataAug)] = newTownAug
+            monthDataSep.loc[len(monthDataSep)] = newTownSep
+            monthDataOct.loc[len(monthDataOct)] = newTownOct
+            monthDataNov.loc[len(monthDataNov)] = newTownNov
+            monthDataDec.loc[len(monthDataDec)] = newTownDec
+    monthDataArray = [monthDataJan, monthDataFeb, monthDataMar, monthDataApr, monthDataMay, monthDataJun, monthDataJul,
+                      monthDataAug, monthDataSep, monthDataOct, monthDataNov, monthDataDec]
+    for m in range(1, 12):
+        monthDataArray[m-1].to_csv(outputPathMonthly+year+' '+str(m), index=False, sep=',')
+    for i in range(0, len(currentYearsMonths)-1):
+        aggregatedData = getAvgMonthlyValues(monthDataArray[i], currentYearsMonths[i])
+        result.loc[len(result)] = aggregatedData
+result.to_csv(outputPath, index=False, sep=',')
