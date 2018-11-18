@@ -1,6 +1,3 @@
-# Source (Beispielhafter Link): https://www.weatheronline.de/weather/maps/city?FMM=1&FYY=2016&LMM=12&LYY=2016&WMO=10481&CONT=dldl&REGION=0001&LAND=DL&ART=TMX&R=0&NOREGION=1&LEVEL=162&LANG=de&MOD=tab
-
-from bs4 import BeautifulSoup as bs
 from robobrowser import RoboBrowser
 import pandas as pd
 
@@ -110,7 +107,7 @@ def getAvgMonthlyValues(monthDataFrame, timestamp):
 monthInputs = {'01': '1', '02': '2', '03': '3', '04': '4', '5': '5', '06': '6',
                '07': '7', '08': '8', '09': '9', '10': '10', '11': '11', '12': '12'}
 yearlist = calcYearList(datelist)
-browser = RoboBrowser(history=True)
+browser = RoboBrowser(history=False)
 browser.open(url)
 townList = browser.find(class_="scroll_c1_r").findChildren("ul", recursive=False)
 result = pd.DataFrame(columns=['datetime', 'dailyTempAvg(Celsius)', 'dailyTempMax(Celsius)', 'dailyTempMin(Celsius)',
