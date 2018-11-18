@@ -265,7 +265,7 @@ for year in yearlist:
             monthDataDec.loc[len(monthDataDec)] = newTownDec
     monthDataArray = [monthDataJan, monthDataFeb, monthDataMar, monthDataApr, monthDataMay, monthDataJun, monthDataJul,
                       monthDataAug, monthDataSep, monthDataOct, monthDataNov, monthDataDec]
-    for m in range(1, 12):
+    for m in range(1, 13):
         monthDataArray[m-1].to_csv(outputPathMonthly+year+'-'+str(m)+'.csv', index=False, sep=',')
     for i in range(0, len(currentYearsMonths)-1):
         aggregatedData = getAvgMonthlyValues(monthDataArray[i], currentYearsMonths[i])
