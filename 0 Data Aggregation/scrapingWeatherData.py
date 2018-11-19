@@ -1,5 +1,6 @@
 from robobrowser import RoboBrowser
 import pandas as pd
+import datetime
 
 # Define the link
 url = 'https://www.weatheronline.de/Deutschland/Berlin.htm'
@@ -16,10 +17,11 @@ weatherCategories = ['Temperatur', 'Tageshöchsttemperatur', 'Nächtl. Tiefsttem
 # Für DataFrames und CSV Dateien werden Spalten ohne Umlaute benötigt
 weatherCategoriesDataFrameColumns = ['Stadt', 'Temperatur', 'dataAvailability1', 'Tageshoechsttemperatur',
                                      'dataAvailability2', 'Naechtl. Tiefsttemperatur', 'dataAvailability3', 'Frosttage',
-                                     'dataAvailability4','Eistage', 'dataAvailability5', 'Niederschlagsmenge',
+                                     'dataAvailability4', 'Eistage', 'dataAvailability5', 'Niederschlagsmenge',
                                      'dataAvailability6', 'Niederschlagstage', 'dataAvailability7',
                                      'Sonnenstunden pro Tag', 'dataAvailability8', 'Windstaerke', 'dataAvailability9',
                                      'Schneetage', 'dataAvailability10', 'Schneehoehen', 'dataAvailability11']
+
 
 def cleanTownName(name):
     name = child.find('a').contents[0].replace(u'\xa0', u'')
@@ -27,6 +29,7 @@ def cleanTownName(name):
     name = name.replace('ö', 'oe')
     name = name.replace('ü', 'ue')
     return name
+
 
 def calcYearList(dateList):
     yearlist = []
@@ -39,9 +42,10 @@ def calcYearList(dateList):
 def getCurrentYearSubset(datelist, year):
     subset = []
     for date in datelist:
-        if date.strftime('%Y')==year:
+        if date.strftime('%Y') == year:
             subset.append(date)
     return subset
+
 
 def getAvgMonthlyValues(monthDataFrame, timestamp):
     tInput = pd.to_numeric(monthDataFrame['Temperatur'])
@@ -114,6 +118,7 @@ result = pd.DataFrame(columns=['datetime', 'dailyTempAvg(Celsius)', 'dailyTempMa
                                'numberFreezingDays', 'numberIcyDays', 'monthlyRainVolume(mm)', 'numberRainyDays',
                                'dailySunnyHoursAvg', 'monthlyWindSpeedAvg(km/h)', 'monthlySnowyDays',
                                'dailySnowVolumeAvg(cm)'])
+print(datetime.datetime.now())
 for year in yearlist:
     monthDataJan = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
     monthDataFeb = pd.DataFrame(columns=weatherCategoriesDataFrameColumns)
@@ -271,3 +276,4 @@ for year in yearlist:
         aggregatedData = getAvgMonthlyValues(monthDataArray[i], currentYearsMonths[i])
         result.loc[len(result)] = aggregatedData
 result.to_csv(outputPath, index=False, sep=',')
+print(datetime.datetime.now())
