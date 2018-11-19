@@ -202,7 +202,7 @@ for year in yearlist:
                                 browser.open('https://www.weatheronline.de' + catLink.attrs['href'])
                                 tables = browser.find_all('table', class_='gr1')
                                 if len(tables) > 0:
-                                    for i in range(1, len(currentYearsMonths)):
+                                    for i in range(1, len(currentYearsMonths)+1):
                                         table = None
                                         j = i
                                         value = 0
@@ -272,7 +272,7 @@ for year in yearlist:
                       monthDataAug, monthDataSep, monthDataOct, monthDataNov, monthDataDec]
     for m in range(1, 13):
         monthDataArray[m-1].to_csv(outputPathMonthly+year+'-'+str(m)+'.csv', index=False, sep=',')
-    for i in range(0, len(currentYearsMonths)-1):
+    for i in range(0, len(currentYearsMonths)):
         aggregatedData = getAvgMonthlyValues(monthDataArray[i], currentYearsMonths[i])
         result.loc[len(result)] = aggregatedData
 result.to_csv(outputPath, index=False, sep=',')
