@@ -1,0 +1,8 @@
+Scraping:
+
+Interpolation:
+-Each year has an unrecorded hour. This is because due to daylight-saving two hours occupy the same hourly slot (30.11 0:00-1:00). Data from only one of these hours has been scraped, data from the second hours will not be manually inserted to keep the data structure of 24 hours per day
+-Related to the same problem on the 27.3 there is an hour slot with no data for it. This null data will not be dropped due to the same reason as above
+
+Cleaning:
+-The columns for "Amount of snow days per month" and "Average daily snow volume per month(cm)" had to be dropped. This is because data availability is very low for these columns which resulted in highly biased data with little use (e.g. 29 snow days for June 2016)
