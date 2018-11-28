@@ -1,0 +1,9 @@
+Scraping:
+For the calculation of the forward premium of the last day of 2017 the dataset from the 01.01.2018 is need additionally.
+
+Interpolation:
+-Each year has an unrecorded hour. This is because due to daylight-saving two hours occupy the same hourly slot (30.10.2016/27.10.2017 2:00-3:00). Data from only one of these hours has been scraped, data from the second hours will not be manually inserted to keep the data structure of 24 hours per day
+-Related to the same problem on the 27.3.2016/31.3.2017 there is an hour slot with no data for it. This null data will not be dropped due to the same reason as above. Instead of this an additional value will be generated. 
+
+Cleaning:
+-The columns for "Amount of snow days per month" and "Average daily snow volume per month(cm)" had to be dropped. This is because data availability is very low for these columns which resulted in highly biased data with little use (e.g. 29 snow days for June 2016)
