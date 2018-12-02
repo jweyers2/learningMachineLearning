@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from pandas.plotting import autocorrelation_plot
 
 path = '../00 Data/Final/cleanFinal.csv'
 dataframe = pd.read_csv(path, dayfirst=True)
@@ -10,6 +11,7 @@ datetime = dataframe['datetime']
 price = dataframe['price']
 price_dayahead = dataframe['price_dayahead']
 price_premium = dataframe['price_premium']
+cat_price_premium = dataframe['cat_price_premium']
 participants = dataframe['participants']
 intraday_consumption = dataframe['consumption']
 dayahead_consumption = dataframe['consumption_dayahead']
@@ -22,6 +24,30 @@ monthlyRainVolume = dataframe['monthlyRainVolume(mm)']
 numberRainyDays = dataframe['numberRainyDays']
 dailySunnyHoursAvg = dataframe['dailySunnyHoursAvg']
 monthlyWindSpeedAvg = dataframe['monthlyWindSpeedAvg(km/h)']
+
+# intraday price autocorrelation
+plt.figure()
+autocorrelation_plot(price)
+plt.savefig('../00 Data/Figures/price_intraday_autocorrelation.png')
+plt.close()
+
+# day ahead price autocorrelation
+plt.figure()
+autocorrelation_plot(price_dayahead)
+plt.savefig('../00 Data/Figures/price_dayahead_autocorrelation.png')
+plt.close()
+
+# price premium autocorrelation
+plt.figure()
+autocorrelation_plot(price_premium)
+plt.savefig('../00 Data/Figures/price_premium_autocorrelation.png')
+plt.close()
+
+# categorical price premium autocorrelation
+plt.figure()
+autocorrelation_plot(cat_price_premium)
+plt.savefig('../00 Data/Figures/price_premium_cat_autocorrelation.png')
+plt.close()
 
 # intraday price
 plt.plot(datetime, price)
