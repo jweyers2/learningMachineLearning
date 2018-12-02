@@ -1,34 +1,34 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-path='../00 Data/Final/cleanFinal.csv'
-dataframe=pd.read_csv(path, dayfirst=True)
+path = '../00 Data/Final/cleanFinal.csv'
+dataframe = pd.read_csv(path, dayfirst=True)
 
-dataframe['datetime']=pd.to_datetime(dataframe['datetime'])
-datetime=dataframe['datetime']
+dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
+datetime = dataframe['datetime']
 
-price= dataframe['price']
-price_dayahead= dataframe['price_dayahead']
-price_premium= dataframe['price_premium']
-participants= dataframe['participants']
-intraday_consumption= dataframe['consumption']
+price = dataframe['price']
+price_dayahead = dataframe['price_dayahead']
+price_premium = dataframe['price_premium']
+participants = dataframe['participants']
+intraday_consumption = dataframe['consumption']
 dayahead_consumption = dataframe['consumption_dayahead']
-dailyTempAvg=dataframe['dailyTempAvg(Celsius)']
-dailyTempMax=dataframe['dailyTempMax(Celsius)']
-dailyTempMin=dataframe['dailyTempMin(Celsius)']
-numberFreezingDays=dataframe['numberFreezingDays']
-numberIcyDays=dataframe['numberIcyDays']
-monthlyRainVolume=dataframe['monthlyRainVolume(mm)']
-numberRainyDays=dataframe['numberRainyDays']
-dailySunnyHoursAvg= dataframe['dailySunnyHoursAvg']
-monthlyWindSpeedAvg=dataframe['monthlyWindSpeedAvg(km/h)']
+dailyTempAvg = dataframe['dailyTempAvg(Celsius)']
+dailyTempMax = dataframe['dailyTempMax(Celsius)']
+dailyTempMin = dataframe['dailyTempMin(Celsius)']
+numberFreezingDays = dataframe['numberFreezingDays']
+numberIcyDays = dataframe['numberIcyDays']
+monthlyRainVolume = dataframe['monthlyRainVolume(mm)']
+numberRainyDays = dataframe['numberRainyDays']
+dailySunnyHoursAvg = dataframe['dailySunnyHoursAvg']
+monthlyWindSpeedAvg = dataframe['monthlyWindSpeedAvg(km/h)']
 
 # intraday price
 plt.plot(datetime, price)
 plt.setp(plt.xticks()[1], rotation=90, ha='left')
 plt.ylabel('Price (€/MWh)')
 plt.title('Intraday auction price history')
-plt.gcf().subplots_adjust(bottom=0.18)
+plt.gcf().subplots_adjust(bottom=0.15)
 
 plt.savefig('../00 Data/Figures/price_intraday.png')
 plt.close()
@@ -135,7 +135,7 @@ plt.plot(datetime, monthlyRainVolume)
 plt.setp(plt.xticks()[1], rotation=90, ha='left')
 plt.ylabel('Rain volume (mm)')
 plt.title('Monthly rain volume')
-plt.gcf().subplots_adjust(bottom=0.18)
+plt.gcf().subplots_adjust(bottom=0.15)
 
 plt.savefig('../00 Data/Figures/rain_volume.png')
 plt.close()
@@ -145,7 +145,7 @@ plt.plot(datetime, numberRainyDays)
 plt.setp(plt.xticks()[1], rotation=90, ha='left')
 plt.ylabel('Number of rainy days')
 plt.title('Number of rainy days per month')
-plt.gcf().subplots_adjust(bottom=0.18)
+plt.gcf().subplots_adjust(bottom=0.15)
 
 plt.savefig('../00 Data/Figures/rainy_day_count.png')
 plt.close()
@@ -155,7 +155,7 @@ plt.plot(datetime, dailySunnyHoursAvg)
 plt.setp(plt.xticks()[1], rotation=90, ha='left')
 plt.ylabel('Number of sunny hours')
 plt.title('Amount of sunny hours on an average day per month')
-plt.gcf().subplots_adjust(bottom=0.18)
+plt.gcf().subplots_adjust(bottom=0.15)
 
 plt.savefig('../00 Data/Figures/sunny_hours.png')
 plt.close()
@@ -165,11 +165,10 @@ plt.plot(datetime, monthlyWindSpeedAvg)
 plt.setp(plt.xticks()[1], rotation=90, ha='left')
 plt.ylabel('Wind speed (km/h)')
 plt.title('Average wind speed per month')
-plt.gcf().subplots_adjust(bottom=0.18)
+plt.gcf().subplots_adjust(bottom=0.15)
 
 plt.savefig('../00 Data/Figures/wind_speed.png')
 plt.close()
 
-#normal plots
-#https://stackoverflow.com/questions/17430105/autofmt-xdate-deletes-x-axis-labels-of-all-subplots
-
+# normal plots
+# https://stackoverflow.com/questions/17430105/autofmt-xdate-deletes-x-axis-labels-of-all-subplots
