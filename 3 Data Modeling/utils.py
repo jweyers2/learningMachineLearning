@@ -2,6 +2,9 @@ import pandas as pd
 
 def train_test_split_predictive(useDevDataset, path):
     dataframe = pd.read_csv(path, dayfirst=True)
+    dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
+    dataframe['datetime'] = dataframe['datetime'].apply(lambda x: x.strftime('%Y%m%d%H%M'))
+    dataframe['datetime'] = dataframe['datetime'].values.astype(int)
     X = dataframe.drop(
         ['price_premium', 'cat_price_premium', 'price_dayahead', 'consumption_dayahead', 'price', 'consumption'],
         axis=1)
