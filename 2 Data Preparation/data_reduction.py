@@ -13,13 +13,10 @@ for index, path in enumerate(paths):
     # Drop snow columns due to low data availability resulting in very biased averages
     dataframe = dataframe.drop(['monthlySnowyDays', 'dailySnowVolumeAvg(cm)'], axis=1)
 
+    dataframe.to_csv(newPaths[index], index=False)
+
     devData = dataframe.sample(1000)
     devData = devData.sort_values(by='datetime')
-    if path == '../00 Data/Final/binaryFinal.csv':
-        dataframe = dataframe.drop(['datetime'], axis=1)
-        devData = devData.drop(['datetime'], axis=1)
-
-    dataframe.to_csv(newPaths[index], index=False)
     devData.to_csv(developerPaths[index], index=False, sep=',')
 
 

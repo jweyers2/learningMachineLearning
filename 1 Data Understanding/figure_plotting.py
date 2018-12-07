@@ -5,9 +5,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from pandas.plotting import autocorrelation_plot
 
-binarypath = '../00 Data/Final/binaryFinal.csv'
-binaryDataframe = pd.read_csv(binarypath, dayfirst=True)
-path = '../00 Data/Final/final.csv'
+path = '../00 Data/Final/binaryFinal.csv'
 dataframe = pd.read_csv(path, dayfirst=True)
 
 dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
@@ -18,7 +16,7 @@ onlyNew = False
 price = dataframe['price']
 price_dayahead = dataframe['price_dayahead']
 price_premium = dataframe['price_premium']
-cat_price_premium = binaryDataframe['cat_price_premium']
+cat_price_premium = dataframe['cat_price_premium']
 participants = dataframe['participants']
 intraday_consumption = dataframe['consumption']
 dayahead_consumption = dataframe['consumption_dayahead']
