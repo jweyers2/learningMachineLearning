@@ -16,5 +16,6 @@ dataframe['october'] = (pd.DatetimeIndex(dataframe['datetime']).month == 10).ast
 dataframe['november'] = (pd.DatetimeIndex(dataframe['datetime']).month == 11).astype(int)
 dataframe['december'] = (pd.DatetimeIndex(dataframe['datetime']).month == 12).astype(int)
 
+
 dataframe.to_csv(path, index=False)
 

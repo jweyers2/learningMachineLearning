@@ -5,7 +5,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from pandas.plotting import autocorrelation_plot
 
-path = '../00 Data/Final/final.csv'
+path = '../00 Data/Final/binaryFinal.csv'
 dataframe = pd.read_csv(path, dayfirst=True)
 
 dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
@@ -202,25 +202,25 @@ if onlyNew == False:
     plt.savefig('../00 Data/Figures/wind_speed.png')
     plt.close()
 
-# day ahead consumption in points
-plt.plot(datetime, dayahead_consumption, 'o', markersize=0.5)
-plt.setp(plt.xticks()[1], rotation=90, ha='left')
-plt.ylabel('Consumption (MWh)')
-plt.title('Day-ahead auction energy consumption in 15 minute time frames')
-plt.gcf().subplots_adjust(bottom=0.15)
+    # day ahead consumption in points
+    plt.plot(datetime, dayahead_consumption, 'o', markersize=0.5)
+    plt.setp(plt.xticks()[1], rotation=90, ha='left')
+    plt.ylabel('Consumption (MWh)')
+    plt.title('Day-ahead auction energy consumption in 15 minute time frames')
+    plt.gcf().subplots_adjust(bottom=0.15)
 
-plt.savefig('../00 Data/Figures/consumption_dayahead_points.png')
-plt.close()
+    plt.savefig('../00 Data/Figures/consumption_dayahead_points.png')
+    plt.close()
 
-# intraday consumption with points
-plt.plot(datetime, intraday_consumption, 'o', markersize=0.5)
-plt.setp(plt.xticks()[1], rotation=90, ha='left')
-plt.ylabel('Consumption (MWh)')
-plt.title('Intraday auction energy consumption in 15 minute time frames')
-plt.gcf().subplots_adjust(bottom=0.15)
+    # intraday consumption with points
+    plt.plot(datetime, intraday_consumption, 'o', markersize=0.5)
+    plt.setp(plt.xticks()[1], rotation=90, ha='left')
+    plt.ylabel('Consumption (MWh)')
+    plt.title('Intraday auction energy consumption in 15 minute time frames')
+    plt.gcf().subplots_adjust(bottom=0.15)
 
-plt.savefig('../00 Data/Figures/consumption_intraday_points.png')
-plt.close()
+    plt.savefig('../00 Data/Figures/consumption_intraday_points.png')
+    plt.close()
 
 
 # normal plots
