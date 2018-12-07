@@ -2,10 +2,10 @@ import sys
 sys.path.insert(0, '../../')
 from utils import train_test_split_predictive
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
 useDevDataset = True
 import warnings
 warnings.simplefilter("ignore")
@@ -25,7 +25,7 @@ testruns = 5
 testrunScores = []
 param_grid = [
     # pca variance ratio
-    [0.75, 0.7, 0.85, 0.9, 0.95, None],
+    [0.75, 0.8, 0.85, 0.9, 0.95, None],
     # loss
     ['hinge', 'log', 'modified_huber', 'squared_hinge', 'perceptron'],
     # penalty
@@ -55,7 +55,7 @@ for ratio in param_grid[0]:
                             clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
                             clf.fit(X_train_train, y_train_train)
                             y_pred = clf.predict(X_train_test)
-                            score = accuracy_score(y_train_true, y_pred)
+                            score = roc_auc_score(y_train_true, y_pred)
                             scores.append(score)
                         testrunScores.append(sum(scores) / len(scores))
                         scores = []

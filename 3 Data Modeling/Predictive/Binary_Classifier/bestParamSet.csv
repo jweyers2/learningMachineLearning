@@ -1,0 +1,2 @@
+ratio,loss,penalty,n_splits,tol,score
+None,hinge,l2,150,0.006999999999999999,0.6214451238524611
