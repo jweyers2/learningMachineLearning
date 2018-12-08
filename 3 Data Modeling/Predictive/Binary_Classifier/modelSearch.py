@@ -5,27 +5,27 @@ import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve
-useDevDataset = True
+useDevDataset = False
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
 
 searchResultsPath = './searchResults.csv'
 path = ''
-if (useDevDataset):
+if useDevDataset:
     path = '../../../00 Data/Final/binaryDeveloperDatasetScaled.csv'
 else:
     path = '../../../00 Data/Final/binaryScaled.csv'
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 X_train_original = X_train
-tscv = TimeSeriesSplit(n_splits=5)
-scores = []
+tscv = TimeSeriesSplit(n_splits=10)
 testruns = 5
 testrunScores = []
+totalpred = []
+totaltrue = []
 param_grid = [
     # pca variance ratio
-    [0.75, 0.8, 0.85, 0.9, 0.95, None],
+    [0.95, 0.975, None],
     # loss
     ['hinge', 'log', 'modified_huber', 'squared_hinge', 'perceptron'],
     # penalty
@@ -55,10 +55,12 @@ for ratio in param_grid[0]:
                             clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
                             clf.fit(X_train_train, y_train_train)
                             y_pred = clf.predict(X_train_test)
-                            score = roc_auc_score(y_train_true, y_pred)
-                            scores.append(score)
-                        testrunScores.append(sum(scores) / len(scores))
-                        scores = []
+                            totalpred.extend(y_pred)
+                            totaltrue.extend(y_train_true)
+                        score = roc_auc_score(totaltrue, totalpred)
+                        testrunScores.append(score)
+                        totalpred = []
+                        totaltrue = []
                     row = [ratio, loss, penalty, n, tol, sum(testrunScores) / len(testrunScores)]
                     testrunScores = []
                     search_results.loc[len(search_results)] = row
