@@ -10,6 +10,7 @@ df.set_index('datetime', inplace=True)
 """
 First Run at 1% Level: -3,4 --> stationary : IS THAT CORRECT?? -> validate!!!
 sources by https://machinelearningmastery.com/time-series-data-stationary-python/
+https://machinelearningmastery.com/time-series-forecast-case-study-python-monthly-armed-robberies-boston/
 """
 def stationaryTest(df):
     from statsmodels.tsa.stattools import adfuller
