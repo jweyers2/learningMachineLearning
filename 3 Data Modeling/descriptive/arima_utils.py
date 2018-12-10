@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 path = '../../00 Data/Final/cleanFinal.csv'
 
@@ -40,6 +41,49 @@ def stationaryTest(df):
 # stationaryTest(df)
 
 """
+PACF / ACF
+RIGHT VALUES FOR P <--ACF / Q <--PACF
+HOW TO DETERMINE THE ACF THRESHOLDS:
+https://stats.stackexchange.com/questions/185425/how-to-determine-the-critical-values-of-acf
+"""
+
+def printPACFACF(df):
+    def cube(x):
+        if 0 <= x: return x ** (1. / 3.)
+        return -(-x) ** (1. / 3.)
+    from statsmodels.tsa.stattools import acf, pacf
+    price_premium = df['price_premium']
+    # print(price_premium)
+    pp_log = price_premium
+    lag_acf = acf(pp_log, nlags=6000)
+    lag_pacf = pacf(pp_log, nlags=20, method='ols')
+    # Plot ACF:
+    plt.subplot(121)
+    plt.plot(lag_acf)
+    plt.axhline(y=0, linestyle='--', color='gray')
+    print(np.sqrt((len(pp_log))))
+    plt.axhline(y=-1.96 / np.sqrt(len(pp_log)), linestyle='--', color='gray')
+    plt.axhline(y=1.96 / np.sqrt(len(pp_log)), linestyle='--', color='gray')
+    plt.title('Autocorrelation Function')
+
+    # Plot PACF:
+    plt.subplot(122)
+    plt.plot(lag_pacf)
+    plt.axhline(y=0, linestyle='--', color='gray')
+    plt.axhline(y=-1.96 / np.sqrt(len(pp_log)), linestyle='--', color='gray')
+    plt.axhline(y=1.96 / np.sqrt(len(pp_log)), linestyle='--', color='gray')
+    plt.title('Partial Autocorrelation Function')
+    plt.tight_layout()
+    # plt.show()
+
+
+    from statsmodels.graphics.tsaplots import plot_acf
+    plot_acf(pp_log)
+    plt.show()
+
+printPACFACF(df)
+
+"""
 TODO: PACF / ACF --> STRUCTURED DETERMINATION OF P , Q (D IS = 0 )
 sources partially by: https://www.analyticsvidhya.com/blog/2016/02/time-series-forecasting-codes-python/
 ASSUMPTION FOR FURTHER MODELING -> TIMESERIES STATIONARY (DICKEY-FULLER-TEST)
@@ -56,4 +100,4 @@ def arima(df):
     ax2.plot(results_AR.predict(start = datetime.datetime(year=2016, month=1, day = 1, hour = 0,minute=0), end = datetime.datetime(year=2017, month=12, day = 31, hour = 23,minute=45), dynamic=True), color='green')
     plt.show()
 
-arima(df)
+# arima(df)
