@@ -1,3 +1,2 @@
-ratio,loss,penalty,n_splits,tol,score
-None,hinge,elasticnet,150,0.001,0.6492127708633675
-None,log,elasticnet,150,0.01,0.6458849362976137
+ratio,loss,penalty,n_splits,tol,score,threshold
+None,hinge,elasticnet,150,0.001,0.6457723562986721,0.884361155413787

@@ -1,7 +1,7 @@
 import pandas as pd
 
 path = './searchResults.csv'
-resultPath = './bestParamSet.csv'
+resultPath = './top2ParamSets.csv'
 results = pd.read_csv(path)
 results = results.fillna('None')
 ordered = results.sort_values(by='score', ascending=False)
