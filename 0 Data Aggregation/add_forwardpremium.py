@@ -1,6 +1,6 @@
 import pandas as pd
 import statistics
-
+# Should not be used anymore because we calculate the price_premium now in another way... 
 path='../00 Data/Final/final.csv'
 dataframe=pd.read_csv(path)
 
