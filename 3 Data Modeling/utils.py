@@ -2,9 +2,10 @@ import pandas as pd
 
 def train_test_split_predictive(path):
     dataframe = pd.read_csv(path, dayfirst=True)
-    X = dataframe.drop(
-        ['price_premium', 'cat_price_premium', 'price_dayahead', 'consumption_dayahead', 'price', 'consumption'],
-        axis=1)
+    # X = dataframe.drop(['price_premium', 'cat_price_premium', 'price_dayahead', 'consumption_dayahead', 'price', 'consumption'],axis=1)
+    X = dataframe.drop(['cat_price_premium'],axis=1)
+    # X = dataframe.drop(['price_premium', 'cat_price_premium', 'price_dayahead', 'price'],axis=1)
+    #X = dataframe[['price_dayahead','price']]
     y = dataframe['cat_price_premium']
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     rowCount = len(dataframe.index)

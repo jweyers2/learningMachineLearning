@@ -39,7 +39,7 @@ if ratio != 'None':
     pca = PCA(n_components=ratio)
     X_train = pca.fit_transform(X_train)
 # tscv = TimeSeriesSplit(n_splits=int(y_train.size/5))
-tscv = TimeSeriesSplit(n_splits=int(100))
+tscv = TimeSeriesSplit(n_splits=int(y_train.size/(96*10)))
 totalpred = []
 totaltrue = []
 totalprob = []
@@ -52,6 +52,10 @@ for t in range(testruns):
                                                                   train_index.size:train_index.size + test_index.size]
         y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                   train_index.size:train_index.size + test_index.size]
+        X_train_train = X_train_train[:-96]
+        X_train_test = X_train_test[:-96]
+        y_train_train = y_train_train[96:]
+        y_train_true = y_train_true[96:]
         clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
         clf.fit(X_train_train, y_train_train)
         y_pred = clf.predict(X_train_test)
@@ -87,6 +91,10 @@ else:
                                                                       train_index.size:train_index.size + test_index.size]
             y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                       train_index.size:train_index.size + test_index.size]
+            X_train_train = X_train_train[:-96]
+            X_train_test = X_train_test[:-96]
+            y_train_train = y_train_train[96:]
+            y_train_true = y_train_true[96:]
             clf = SGDClassifier(loss=loss2, penalty=penalty2, max_iter=n2, tol=tol2)
             clf.fit(X_train_train, y_train_train)
             y_pred2 = clf.predict(X_train_test)
@@ -120,6 +128,10 @@ for t in range(testruns):
                                                                   train_index.size:train_index.size + test_index.size]
         y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                   train_index.size:train_index.size + test_index.size]
+        X_train_train = X_train_train[:-96]
+        X_train_test = X_train_test[:-96]
+        y_train_train = y_train_train[96:]
+        y_train_true = y_train_true[96:]
         clf = SGDClassifier(loss=loss_proba_model, penalty=penalty_proba_model, max_iter=n_proba_model, tol=tol_proba_model)
         clf.fit(X_train_train, y_train_train)
         y_pred3 = clf.predict(X_train_test)

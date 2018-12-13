@@ -31,14 +31,13 @@ ratio = paramSet.iloc[0]['ratio']
 threshold = paramSet.iloc[0]['threshold']
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 dataframe = pd.read_csv(path, dayfirst=True)
-X = dataframe.drop(['price_premium', 'cat_price_premium', 'price_dayahead', 'consumption_dayahead', 'price', 'consumption'],axis=1)
-y = dataframe['cat_price_premium']
 if ratio != 'None':
     pca = PCA(n_components=ratio)
-    X_train = pca.fit_transform(X)
+    X_train = pca.fit_transform(X_train)
 # tscv = TimeSeriesSplit(n_splits=int(y_test.size/5))
 # Each split should contain 1 whole day
-tscv = TimeSeriesSplit(n_splits=int(y_test.size/96))
+# tscv = TimeSeriesSplit(n_splits=int(y_test.size/96))
+tscv = TimeSeriesSplit(n_splits=int(25))
 totalpred = []
 totaltrue = []
 totalprob = []
@@ -51,10 +50,10 @@ for t in range(testruns):
     for train_index, test_index in tscv.split(X_test):
         # For the first iteration train on the training set and predict the first test set split
         if firstIteration is True:
-            X_test_train = X_train
-            y_test_train = y_train
-            X_test_test = X_test[:train_index.size]
-            y_test_test = y_test[:train_index.size]
+            X_test_train = X_train[:-96]
+            y_test_train = y_train[96:]
+            X_test_test = X_test[:train_index.size-96]
+            y_test_test = y_test[96:train_index.size]
             firstIteration = False
             clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
             clf.fit(X_test_train, y_test_train)
@@ -73,6 +72,10 @@ for t in range(testruns):
         # For the iterations 2+ on the training set and some of the test set splits and predict the next test set split
         X_test_train, X_test_test = X_train.append(X_test[:train_index.size]), X_test[train_index.size:train_index.size + test_index.size]
         y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
+        X_test_train = X_test_train[:-96]
+        X_test_test = X_test_test[:-96]
+        y_test_train = y_test_train[96:]
+        y_test_test = y_test_test[96:]
         clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
         clf.fit(X_test_train, y_test_train)
         y_pred = clf.predict(X_test_test)

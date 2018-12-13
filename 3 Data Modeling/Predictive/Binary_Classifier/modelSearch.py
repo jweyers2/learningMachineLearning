@@ -19,7 +19,7 @@ else:
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 X_train_original = X_train
 tscv = TimeSeriesSplit(n_splits=10)
-testruns = 5
+testruns = 3
 testrunScores = []
 totalpred = []
 totaltrue = []
@@ -52,6 +52,10 @@ for ratio in param_grid[0]:
                                                                                       train_index.size:train_index.size + test_index.size]
                             y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                                       train_index.size:train_index.size + test_index.size]
+                            X_train_train = X_train_train[:-96]
+                            X_train_test = X_train_test[:-96]
+                            y_train_train = y_train_train[96:]
+                            y_train_true = y_train_true[96:]
                             clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
                             clf.fit(X_train_train, y_train_train)
                             y_pred = clf.predict(X_train_test)
