@@ -6,7 +6,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
-useDevDataset = False
+useDevDataset = True
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
@@ -36,10 +36,11 @@ ratio_proba_model = ratio
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 X_train_original = X_train
 if ratio != 'None':
-    pca = PCA(n_components=ratio)
+    pca = PCA(n_components=float(ratio))
     X_train = pca.fit_transform(X_train)
 # tscv = TimeSeriesSplit(n_splits=int(y_train.size/5))
-tscv = TimeSeriesSplit(n_splits=int(y_train.size/(96*10)))
+# tscv = TimeSeriesSplit(n_splits=int(y_train.size/(96*10)))
+tscv = TimeSeriesSplit(n_splits=int(10))
 totalpred = []
 totaltrue = []
 totalprob = []
@@ -52,10 +53,6 @@ for t in range(testruns):
                                                                   train_index.size:train_index.size + test_index.size]
         y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                   train_index.size:train_index.size + test_index.size]
-        X_train_train = X_train_train[:-96]
-        X_train_test = X_train_test[:-96]
-        y_train_train = y_train_train[96:]
-        y_train_true = y_train_true[96:]
         clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
         clf.fit(X_train_train, y_train_train)
         y_pred = clf.predict(X_train_test)
@@ -80,7 +77,7 @@ else:
     tol2 = paramSet.iloc[1]['tol']
     ratio2 = paramSet.iloc[1]['ratio']
     if ratio2 != 'None':
-        pca = PCA(n_components=ratio2)
+        pca = PCA(n_components=float(ratio2))
         X_train = pca.fit_transform(X_train)
     totalpred2 = []
     totaltrue2 = []
@@ -91,10 +88,6 @@ else:
                                                                       train_index.size:train_index.size + test_index.size]
             y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                       train_index.size:train_index.size + test_index.size]
-            X_train_train = X_train_train[:-96]
-            X_train_test = X_train_test[:-96]
-            y_train_train = y_train_train[96:]
-            y_train_true = y_train_true[96:]
             clf = SGDClassifier(loss=loss2, penalty=penalty2, max_iter=n2, tol=tol2)
             clf.fit(X_train_train, y_train_train)
             y_pred2 = clf.predict(X_train_test)
@@ -116,7 +109,7 @@ else:
 # Train a fine tuned model
 X_train = X_train_original
 if ratio_proba_model != 'None':
-    pca = PCA(n_components=ratio_proba_model)
+    pca = PCA(n_components=float(ratio_proba_model))
     X_train = pca.fit_transform(X_train)
 totalpred3 = []
 totaltrue3 = []
@@ -128,10 +121,6 @@ for t in range(testruns):
                                                                   train_index.size:train_index.size + test_index.size]
         y_train_train, y_train_true = y_train[:train_index.size], y_train[
                                                                   train_index.size:train_index.size + test_index.size]
-        X_train_train = X_train_train[:-96]
-        X_train_test = X_train_test[:-96]
-        y_train_train = y_train_train[96:]
-        y_train_true = y_train_true[96:]
         clf = SGDClassifier(loss=loss_proba_model, penalty=penalty_proba_model, max_iter=n_proba_model, tol=tol_proba_model)
         clf.fit(X_train_train, y_train_train)
         y_pred3 = clf.predict(X_train_test)

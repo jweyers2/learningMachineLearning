@@ -2,12 +2,13 @@ import sys
 sys.path.insert(0, '../../')
 from utils import train_test_split_predictive
 import pandas as pd
+import numpy
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
-useDevDataset = False
+useDevDataset = True
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
@@ -29,11 +30,11 @@ n = paramSet.iloc[0]['n_splits']
 tol = paramSet.iloc[0]['tol']
 ratio = paramSet.iloc[0]['ratio']
 threshold = paramSet.iloc[0]['threshold']
-X_train, X_test, y_train, y_test = train_test_split_predictive(path)
+X_train, X_test, y_train, y_test = train_test_split_predictive(path, ratio)
 dataframe = pd.read_csv(path, dayfirst=True)
-if ratio != 'None':
-    pca = PCA(n_components=ratio)
-    X_train = pca.fit_transform(X_train)
+# if ratio != 'None':
+#     pca = PCA(n_components=float(ratio))
+#     X_train = pca.fit_transform(X_train)
 # tscv = TimeSeriesSplit(n_splits=int(y_test.size/5))
 # Each split should contain 1 whole day
 # tscv = TimeSeriesSplit(n_splits=int(y_test.size/96))
@@ -50,10 +51,10 @@ for t in range(testruns):
     for train_index, test_index in tscv.split(X_test):
         # For the first iteration train on the training set and predict the first test set split
         if firstIteration is True:
-            X_test_train = X_train[:-96]
-            y_test_train = y_train[96:]
-            X_test_test = X_test[:train_index.size-96]
-            y_test_test = y_test[96:train_index.size]
+            X_test_train = X_train
+            y_test_train = y_train
+            X_test_test = X_test[:train_index.size]
+            y_test_test = y_test[:train_index.size]
             firstIteration = False
             clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
             clf.fit(X_test_train, y_test_train)
@@ -70,12 +71,10 @@ for t in range(testruns):
                     else:
                         threshold_predictions.append(0)
         # For the iterations 2+ on the training set and some of the test set splits and predict the next test set split
-        X_test_train, X_test_test = X_train.append(X_test[:train_index.size]), X_test[train_index.size:train_index.size + test_index.size]
+        # X_test_train, X_test_test = X_train.append(X_test[:train_index.size]), X_test[train_index.size:train_index.size + test_index.size]
+        # y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
+        X_test_train, X_test_test = numpy.vstack([X_train, X_test[:train_index.size]]), X_test[train_index.size:train_index.size + test_index.size]
         y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
-        X_test_train = X_test_train[:-96]
-        X_test_test = X_test_test[:-96]
-        y_test_train = y_test_train[96:]
-        y_test_test = y_test_test[96:]
         clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
         clf.fit(X_test_train, y_test_train)
         y_pred = clf.predict(X_test_test)
