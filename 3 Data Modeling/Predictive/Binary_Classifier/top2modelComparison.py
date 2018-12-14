@@ -6,7 +6,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
-useDevDataset = True
+useDevDataset = False
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
@@ -39,8 +39,8 @@ if ratio != 'None':
     pca = PCA(n_components=float(ratio))
     X_train = pca.fit_transform(X_train)
 # tscv = TimeSeriesSplit(n_splits=int(y_train.size/5))
-# tscv = TimeSeriesSplit(n_splits=int(y_train.size/(96*10)))
-tscv = TimeSeriesSplit(n_splits=int(10))
+tscv = TimeSeriesSplit(n_splits=int(y_train.size/(96*10)))
+# tscv = TimeSeriesSplit(n_splits=int(10))
 totalpred = []
 totaltrue = []
 totalprob = []

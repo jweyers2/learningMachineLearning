@@ -1,5 +1,5 @@
 import pandas as pd
-useGridSearch = False
+useGridSearch = True
 
 path = './searchResults.csv'
 resultPath = './top2ParamSets.csv'
@@ -20,7 +20,7 @@ param_grid = [
 ]
 result = pd.DataFrame(columns=['ratio', 'loss', 'penalty', 'n_splits', 'tol', 'score'])
 if useGridSearch is True:
-    best = ordered.iloc[:5]
+    best = ordered.iloc[:10]
     ranking = pd.DataFrame(columns=['ratio', 'loss', 'penalty', 'n_splits', 'tol'])
     param_list = ['ratio', 'loss', 'penalty', 'n_splits', 'tol']
     bestParamSet = []

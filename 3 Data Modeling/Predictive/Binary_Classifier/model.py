@@ -8,7 +8,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
-useDevDataset = True
+useDevDataset = False
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
@@ -35,10 +35,8 @@ dataframe = pd.read_csv(path, dayfirst=True)
 # if ratio != 'None':
 #     pca = PCA(n_components=float(ratio))
 #     X_train = pca.fit_transform(X_train)
-# tscv = TimeSeriesSplit(n_splits=int(y_test.size/5))
-# Each split should contain 1 whole day
-# tscv = TimeSeriesSplit(n_splits=int(y_test.size/96))
-tscv = TimeSeriesSplit(n_splits=int(25))
+tscv = TimeSeriesSplit(n_splits=int(y_test.size/(96)))
+# tscv = TimeSeriesSplit(n_splits=int(25))
 totalpred = []
 totaltrue = []
 totalprob = []
@@ -71,8 +69,6 @@ for t in range(testruns):
                     else:
                         threshold_predictions.append(0)
         # For the iterations 2+ on the training set and some of the test set splits and predict the next test set split
-        # X_test_train, X_test_test = X_train.append(X_test[:train_index.size]), X_test[train_index.size:train_index.size + test_index.size]
-        # y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
         X_test_train, X_test_test = numpy.vstack([X_train, X_test[:train_index.size]]), X_test[train_index.size:train_index.size + test_index.size]
         y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
         clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
@@ -89,6 +85,7 @@ for t in range(testruns):
                     threshold_predictions.append(1)
                 else:
                     threshold_predictions.append(0)
+    print(t)
 
 
 if loss == 'log':

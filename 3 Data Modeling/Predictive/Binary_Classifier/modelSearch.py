@@ -6,9 +6,9 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
 import random
-useDevDataset = False
-useGridSearch = False
-randomSearchCount = 100
+useDevDataset = True
+useGridSearch = True
+randomSearchCount = 250
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
@@ -21,8 +21,8 @@ else:
     path = '../../../00 Data/Final/binaryScaled.csv'
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 X_train_original = X_train
-tscv = TimeSeriesSplit(n_splits=50)
-testruns = 3
+tscv = TimeSeriesSplit(n_splits=10)
+testruns = 5
 testrunScores = []
 totalpred = []
 totaltrue = []
