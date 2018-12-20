@@ -36,10 +36,11 @@ ratio_proba_model = ratio
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 X_train_original = X_train
 if ratio != 'None':
-    pca = PCA(n_components=ratio)
+    pca = PCA(n_components=float(ratio))
     X_train = pca.fit_transform(X_train)
 # tscv = TimeSeriesSplit(n_splits=int(y_train.size/5))
-tscv = TimeSeriesSplit(n_splits=int(100))
+tscv = TimeSeriesSplit(n_splits=int(y_train.size/(96*10)))
+# tscv = TimeSeriesSplit(n_splits=int(10))
 totalpred = []
 totaltrue = []
 totalprob = []
@@ -76,7 +77,7 @@ else:
     tol2 = paramSet.iloc[1]['tol']
     ratio2 = paramSet.iloc[1]['ratio']
     if ratio2 != 'None':
-        pca = PCA(n_components=ratio2)
+        pca = PCA(n_components=float(ratio2))
         X_train = pca.fit_transform(X_train)
     totalpred2 = []
     totaltrue2 = []
@@ -108,7 +109,7 @@ else:
 # Train a fine tuned model
 X_train = X_train_original
 if ratio_proba_model != 'None':
-    pca = PCA(n_components=ratio_proba_model)
+    pca = PCA(n_components=float(ratio_proba_model))
     X_train = pca.fit_transform(X_train)
 totalpred3 = []
 totaltrue3 = []

@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0, '../../')
 from utils import train_test_split_predictive
 import pandas as pd
+import numpy
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score
@@ -29,14 +30,13 @@ n = paramSet.iloc[0]['n_splits']
 tol = paramSet.iloc[0]['tol']
 ratio = paramSet.iloc[0]['ratio']
 threshold = paramSet.iloc[0]['threshold']
+X_train, X_test, y_train, y_test = train_test_split_predictive(path, ratio)
 dataframe = pd.read_csv(path, dayfirst=True)
-X = dataframe.drop(['price_premium', 'cat_price_premium', 'price_dayahead', 'consumption_dayahead', 'price', 'consumption'],axis=1)
-y = dataframe['cat_price_premium']
-if ratio != 'None':
-    pca = PCA(n_components=ratio)
-    X_train = pca.fit_transform(X)
-# tscv = TimeSeriesSplit(n_splits=int(y_train.size/5))
-tscv = TimeSeriesSplit(n_splits=int(100))
+# if ratio != 'None':
+#     pca = PCA(n_components=float(ratio))
+#     X_train = pca.fit_transform(X_train)
+tscv = TimeSeriesSplit(n_splits=int(y_test.size/(96)))
+# tscv = TimeSeriesSplit(n_splits=int(25))
 totalpred = []
 totaltrue = []
 totalprob = []
@@ -45,23 +45,47 @@ testruns = 10
 
 # Do a run with the test set using the best performing model
 for t in range(testruns):
-    for train_index, test_index in tscv.split(X):
-        X_train, X_test = X[:train_index.size], X[train_index.size:train_index.size + test_index.size]
-        y_train, y_test = y[:train_index.size], y[train_index.size:train_index.size + test_index.size]
+    firstIteration = True
+    for train_index, test_index in tscv.split(X_test):
+        # For the first iteration train on the training set and predict the first test set split
+        if firstIteration is True:
+            X_test_train = X_train
+            y_test_train = y_train
+            X_test_test = X_test[:train_index.size]
+            y_test_test = y_test[:train_index.size]
+            firstIteration = False
+            clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
+            clf.fit(X_test_train, y_test_train)
+            y_pred = clf.predict(X_test_test)
+            totalpred.extend(y_pred)
+            totaltrue.extend(y_test_test)
+            # If the loss function is 'log' then use the given threshold from the csv
+            if loss == 'log':
+                y_proba = clf.predict_proba(X_test_test)
+                totalprob.extend(y_proba[:, 1])
+                for pred in y_proba[:, 1]:
+                    if pred >= threshold:
+                        threshold_predictions.append(1)
+                    else:
+                        threshold_predictions.append(0)
+        # For the iterations 2+ on the training set and some of the test set splits and predict the next test set split
+        X_test_train, X_test_test = numpy.vstack([X_train, X_test[:train_index.size]]), X_test[train_index.size:train_index.size + test_index.size]
+        y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
         clf = SGDClassifier(loss=loss, penalty=penalty, max_iter=n, tol=tol)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
+        clf.fit(X_test_train, y_test_train)
+        y_pred = clf.predict(X_test_test)
         totalpred.extend(y_pred)
-        totaltrue.extend(y_test)
+        totaltrue.extend(y_test_test)
         # If the loss function is 'log' then use the given threshold from the csv
         if loss == 'log':
-            y_proba = clf.predict_proba(X_test)
+            y_proba = clf.predict_proba(X_test_test)
             totalprob.extend(y_proba[:, 1])
             for pred in y_proba[:, 1]:
                 if pred >= threshold:
                     threshold_predictions.append(1)
                 else:
                     threshold_predictions.append(0)
+    print(t)
 
 
 if loss == 'log':
