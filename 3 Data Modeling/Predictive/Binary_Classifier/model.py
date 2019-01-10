@@ -88,8 +88,8 @@ for t in range(testruns):
     print(t)
 
 
-if loss == 'log':
-    totalpred = threshold_predictions
+# if loss == 'log':
+#     totalpred = threshold_predictions
 fpr, tpr, _ = roc_curve(totaltrue, totalpred)
 score = roc_auc_score(totaltrue, totalpred)
 

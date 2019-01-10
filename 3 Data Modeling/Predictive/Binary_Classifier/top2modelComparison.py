@@ -6,6 +6,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import accuracy_score
 useDevDataset = False
 import warnings
 warnings.simplefilter("ignore")
@@ -62,7 +63,8 @@ for t in range(testruns):
             y_proba = clf.predict_proba(X_train_test)
             totalprob.extend(y_proba[:, 1])
 print('Model 1 finished')
-score = roc_auc_score(totaltrue, totalpred)
+# score = roc_auc_score(totaltrue, totalpred)
+score = accuracy_score(totaltrue, totalpred)
 fpr, tpr, _ = roc_curve(totaltrue, totalpred)
 # If the best param set already supports probability prediction, set the threshold here
 if loss == 'log':
@@ -82,6 +84,7 @@ else:
     totalpred2 = []
     totaltrue2 = []
     totalprob2 = []
+    threshold_predictions = []
     for t in range(testruns):
         for train_index, test_index in tscv.split(X_train):
             X_train_train, X_train_test = X_train[:train_index.size], X_train[
@@ -95,6 +98,11 @@ else:
             totaltrue2.extend(y_train_true)
             y_proba2 = clf.predict_proba(X_train_test)
             totalprob2.extend(y_proba2[:, 1])
+            for pred in y_proba2[:, 1]:
+                if pred >= threshold:
+                    threshold_predictions.append(1)
+                else:
+                    threshold_predictions.append(0)
     fpr2, tpr2, _2 = roc_curve(totaltrue, totalpred)
     # Set the threshold
     threshold = tpr2[1]
@@ -106,44 +114,48 @@ else:
     ratio_proba_model = ratio2
     print('Model 2 finished')
 
-# Train a fine tuned model
-X_train = X_train_original
-if ratio_proba_model != 'None':
-    pca = PCA(n_components=float(ratio_proba_model))
-    X_train = pca.fit_transform(X_train)
-totalpred3 = []
-totaltrue3 = []
-totalprob3 = []
-threshold_predictions = []
-for t in range(testruns):
-    for train_index, test_index in tscv.split(X_train):
-        X_train_train, X_train_test = X_train[:train_index.size], X_train[
-                                                                  train_index.size:train_index.size + test_index.size]
-        y_train_train, y_train_true = y_train[:train_index.size], y_train[
-                                                                  train_index.size:train_index.size + test_index.size]
-        clf = SGDClassifier(loss=loss_proba_model, penalty=penalty_proba_model, max_iter=n_proba_model, tol=tol_proba_model)
-        clf.fit(X_train_train, y_train_train)
-        y_pred3 = clf.predict(X_train_test)
-        totalpred3.extend(y_pred3)
-        totaltrue3.extend(y_train_true)
-        y_proba3 = clf.predict_proba(X_train_test)
-        totalprob3.extend(y_proba3[:, 1])
-        for pred in y_proba3[:, 1]:
-            if pred >= threshold:
-                threshold_predictions.append(1)
-            else:
-                threshold_predictions.append(0)
+# # Train a fine tuned model
+# X_train = X_train_original
+# if ratio_proba_model != 'None':
+#     pca = PCA(n_components=float(ratio_proba_model))
+#     X_train = pca.fit_transform(X_train)
+# totalpred3 = []
+# totaltrue3 = []
+# totalprob3 = []
+# threshold_predictions = []
+# for t in range(testruns):
+#     for train_index, test_index in tscv.split(X_train):
+#         X_train_train, X_train_test = X_train[:train_index.size], X_train[
+#                                                                   train_index.size:train_index.size + test_index.size]
+#         y_train_train, y_train_true = y_train[:train_index.size], y_train[
+#                                                                   train_index.size:train_index.size + test_index.size]
+#         clf = SGDClassifier(loss=loss_proba_model, penalty=penalty_proba_model, max_iter=n_proba_model, tol=tol_proba_model)
+#         clf.fit(X_train_train, y_train_train)
+#         y_pred3 = clf.predict(X_train_test)
+#         totalpred3.extend(y_pred3)
+#         totaltrue3.extend(y_train_true)
+#         y_proba3 = clf.predict_proba(X_train_test)
+#         totalprob3.extend(y_proba3[:, 1])
+#         for pred in y_proba3[:, 1]:
+#             if pred >= threshold:
+#                 threshold_predictions.append(1)
+#             else:
+#                 threshold_predictions.append(0)
 
 # Compare the fined tuned model to the previous one
-score_tuned = roc_auc_score(totaltrue3, threshold_predictions)
-if score_tuned > score:
-    # Document the third model since it's better
-    loss = loss_proba_model
-    penalty = penalty_proba_model
-    n = n_proba_model
-    ratio = ratio_proba_model
-    tol = tol_proba_model
-    score = score_tuned
+# score_tuned = roc_auc_score(totaltrue3, threshold_predictions)
+if loss != 'log':
+    # score_tuned = roc_auc_score(totaltrue2, threshold_predictions)
+    score_tuned = accuracy_score(totaltrue2, threshold_predictions)
+    if score_tuned > score:
+        # Document the third model since it's better
+        loss = loss_proba_model
+        penalty = penalty_proba_model
+        n = n_proba_model
+        ratio = ratio_proba_model
+        tol = tol_proba_model
+        score = score_tuned
+
 
 result = pd.DataFrame(columns=['ratio', 'loss', 'penalty', 'n_splits', 'tol', 'score', 'threshold'])
 bestParamSet = []

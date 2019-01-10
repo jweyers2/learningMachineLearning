@@ -1,5 +1,5 @@
 import pandas as pd
-useGridSearch = True
+useGridSearch = False
 
 path = './searchResults.csv'
 resultPath = './top2ParamSets.csv'
