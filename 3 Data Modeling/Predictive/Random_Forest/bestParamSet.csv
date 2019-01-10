@@ -1,0 +1,2 @@
+ratio,max_depth,min_samples_split,max_leaf_nodes,min_impurity_decrease,score
+0.975,5.0,50.0,3.0,0.0,0.7259999999999999
