@@ -5,10 +5,11 @@ import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import accuracy_score
 import random
 useDevDataset = True
 useGridSearch = True
-randomSearchCount = 250
+randomSearchCount = 50
 import warnings
 warnings.simplefilter("ignore")
 from sklearn.decomposition import PCA
@@ -62,7 +63,8 @@ if useGridSearch is True:
                                 y_pred = clf.predict(X_train_test)
                                 totalpred.extend(y_pred)
                                 totaltrue.extend(y_train_true)
-                            score = roc_auc_score(totaltrue, totalpred)
+                            #score = roc_auc_score(totaltrue, totalpred)
+                            score = round(accuracy_score(totaltrue, totalpred), 2)
                             testrunScores.append(score)
                             totalpred = []
                             totaltrue = []
@@ -95,7 +97,8 @@ else:
                 y_pred = clf.predict(X_train_test)
                 totalpred.extend(y_pred)
                 totaltrue.extend(y_train_true)
-            score = roc_auc_score(totaltrue, totalpred)
+            #score = roc_auc_score(totaltrue, totalpred)
+            score = round(accuracy_score(totaltrue, totalpred), 2)
             testrunScores.append(score)
             totalpred = []
             totaltrue = []

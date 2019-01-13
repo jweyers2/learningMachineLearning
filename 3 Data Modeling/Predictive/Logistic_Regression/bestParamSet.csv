@@ -1,0 +1,2 @@
+ratio,penalty,c,solver,score,probability
+None,l1,1,liblinear,0.722,0.7163406671435044
