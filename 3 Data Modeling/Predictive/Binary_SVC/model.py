@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from sklearn.externals import joblib
 from sklearn.metrics import confusion_matrix
 import seaborn as sn
+import datetime
 
 useDevDataset = False
 probability = True
@@ -39,23 +40,26 @@ if ratio == 'None':
 X_train, X_test, y_train, y_test = train_test_split_predictive(path, ratio)
 dataframe = pd.read_csv(path, dayfirst=True)
 #print(int(y_test.size/(96)))
-tscv = TimeSeriesSplit(n_splits=10)
+tscv = TimeSeriesSplit(n_splits=int(y_test.size/(96)))
+print('Total splits = '+str(tscv.n_splits))
 totalpred = []
 totaltrue = []
 totalprob = []
 avg = []
-
+counter = 0
 firstIteration = True
 for train_index, test_index in tscv.split(X_test):
     # For the first iteration train on the training set and predict the first test set split
     if firstIteration is True:
         firstIteration = False
+        print(str(datetime.datetime.now()) + ' | ' + str(counter))
         x_test_train = X_train
         y_test_train = y_train
         x_test_test = X_test[:train_index.size]
         y_test_test = y_test[:train_index.size]
     else:
         # For the iterations 2+ on the training set and some of the test set splits and predict the next test set split
+        print(str(datetime.datetime.now()) + ' | ' + str(counter))
         x_test_train, x_test_test = numpy.vstack([X_train, X_test[:train_index.size]]), X_test[train_index.size:train_index.size + test_index.size]
         y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
     if gamma != 'None':
@@ -71,6 +75,7 @@ for train_index, test_index in tscv.split(X_test):
     if probability:
         y_proba = clf.predict_proba(x_test_test)
         totalprob.extend(y_proba[:, 1])
+    counter = counter + 1
 joblib.dump(clf, './model.pkl')
 
 #ROC Curve
