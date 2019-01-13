@@ -33,6 +33,8 @@ plt.legend(legend, loc=1)
 
 #Make Bottom visible
 plt.gcf().subplots_adjust(bottom=0.3)
+axes = plt.gca()
+axes.set_ylim([0, 1])
 
 # Create legend & Show graphic
 #plt.show()
