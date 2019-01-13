@@ -8,7 +8,7 @@ dataframe=pd.read_csv(path)
 
 dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
 
-# Add new rows for aggregated price and volume data of both auctions for the las 2-1 days, 9-2 days and 31-9 days
+# Add new rows for aggregated price and volume data of both auctions for the las 2-1 days, 9-2 days
 # last 24 hours before 11:45 on the day of the last auction
 dataframe['price_dayahead_lastDay'] = np.nan
 dataframe['consumption_dayahead_lastDay'] = np.nan
