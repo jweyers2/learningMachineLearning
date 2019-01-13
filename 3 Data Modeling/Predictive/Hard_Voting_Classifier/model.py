@@ -37,9 +37,9 @@ totaltrue = []
 totalprob = []
 
 clf1 = SGDClassifier(loss='log', penalty='elasticnet', max_iter=100, tol=0.001)
-clf2 = DecisionTreeClassifier(min_samples_leaf=500, max_depth=20, min_impurity_decrease=0.001)
-clf3 = LogisticRegression(random_state=0, solver='lbfgs',multi_class='multinomial')
-clf4 = svm.SVC(gamma='scale')
+clf2 = DecisionTreeClassifier(min_samples_leaf=500, max_depth=5, min_impurity_decrease=0.005, random_state=1)
+clf3 = LogisticRegression(penalty='l1',c=1,solver='liblinear')
+clf4 = svm.SVC(c=1,kernel='rbf',gamma='auto',degree=None)
 clf5 = GaussianNB()
 clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4),('gnb',clf5)],voting='hard')
 
