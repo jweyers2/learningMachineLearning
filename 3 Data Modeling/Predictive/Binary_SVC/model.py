@@ -19,7 +19,7 @@ import seaborn as sn
 import datetime
 
 useDevDataset = False
-probability = True
+probability = False
 
 # path = ''
 if useDevDataset:
