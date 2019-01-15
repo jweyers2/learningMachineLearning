@@ -38,11 +38,10 @@ totalprob = []
 
 clf1 = SGDClassifier(loss='log', penalty='elasticnet', max_iter=100, tol=0.001)
 clf2 = DecisionTreeClassifier(min_samples_leaf=500, max_depth=5, min_impurity_decrease=0.005, random_state=1)
-clf3 = LogisticRegression(penalty='l1',c=1,solver='liblinear')
-clf4 = svm.SVC(c=1,kernel='rbf',gamma='auto',degree=None)
+clf3 = LogisticRegression(penalty='l1',C=1,solver='liblinear')
+clf4 = svm.SVC(C=1,kernel='rbf',gamma='auto')
 clf5 = GaussianNB()
 clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4),('gnb',clf5)],voting='hard')
-
 counter = 0
 
 firstIteration = True
@@ -55,7 +54,7 @@ for train_index, test_index in tscv.split(X_test):
         X_test_test = X_test[:train_index.size]
         y_test_test = y_test[:train_index.size]
         firstIteration = False
-        clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4)],voting='hard')
+        clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4),('gnb',clf5)],voting='hard')
         clf.fit(X_test_train, y_test_train)
         # y_proba = clf.predict_proba(X_test_test)
         # totalprob.extend(y_proba[:, 1])
@@ -67,7 +66,7 @@ for train_index, test_index in tscv.split(X_test):
     print(str(datetime.datetime.now()) + ' | ' + str(counter))
     X_test_train, X_test_test = numpy.vstack([X_train, X_test[:train_index.size]]), X_test[train_index.size:train_index.size + test_index.size]
     y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
-    clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4)],voting='hard')
+    clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4),('gnb',clf5)],voting='hard')
     clf.fit(X_test_train, y_test_train)
     # y_proba = clf.predict_proba(X_test_test)
     # totalprob.extend(y_proba[:, 1])
@@ -90,7 +89,7 @@ plt.xlabel('False positive rate')
 plt.ylabel('True positive rate')
 plt.legend(loc=4)
 plt.savefig('./rocCurve.png')
-clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4)],voting='hard')
+clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svm',clf4),('gnb',clf5)],voting='hard')
 joblib.dump(clf, './model.pkl')
 
 conf_matrix = confusion_matrix(totaltrue, totalpred)
