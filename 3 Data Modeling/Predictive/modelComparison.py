@@ -20,7 +20,7 @@ plt.bar(r2, roc, color='#81F781', width=barWidth, edgecolor='white', label='roc'
 
 # Add xticks on the middle of the group bars
 plt.xlabel('group', fontweight='bold')
-plt.xticks([r + barWidth for r in range(len(accuracy))], ['SGD','SVC','GaussianNB', 'Soft Voting', 'Soft Voting', 'Logistic Reg.', 'RNN', 'Decision Tree', 'ARIMA', 'Random Forest'])
+plt.xticks([r + barWidth for r in range(len(accuracy))], ['SGD','SVC','GaussianNB', 'Soft Voting', 'Hard Voting', 'Logistic Reg.', 'RNN', 'Decision Tree', 'ARIMA', 'Random Forest'])
 plt.xticks(rotation=70)
 
 #Labels
