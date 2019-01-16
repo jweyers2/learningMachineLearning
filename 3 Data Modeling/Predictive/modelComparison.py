@@ -6,24 +6,20 @@ import pandas as pd
 # set width of bar
 barWidth = 0.25
 
-accuracy = [0.79,0.8,0.66,0.77,0.8,0.8,0.814,0.0,0.72]
-roc =      [0.72,0.73,0.7,0.74,0.73,0.72,0.75,0.0,0.5]
-
-
-# values = [accuracy, roc]
-# df = pd.DataFrame(values, columns=['accuracy', 'roc'],
-#     index=['SGD','SVC','GaussianNB', 'Soft Voting', 'Hard Voting', 'Logistic Reg.', 'RNN', 'Decision Tree', 'Random Forest'])
-# df.loc[len(df)] = [0.79, 0.72] #SGD
-# df.loc[len(df)] = [0.8, 0.73] #SVC
-# df.loc[len(df)] = [0.66, 0.7] #GNB
-# df.loc[len(df)] = [0.77, 0.74] #Soft
-# df.loc[len(df)] = [0.8, 0.73] #Hard
-# df.loc[len(df)] = [0.8, 0.72] #Logistic
-# df.loc[len(df)] = [0.814, 0.75] #RNN
-# df.loc[len(df)] = [0, 0] #Tree
-# df.loc[len(df)] = [0.72, 0.5] #RF
-# df.sort_values(by='accuracy', ascending=False)
-# print(df)
+#results for prediction analysis
+df = pd.DataFrame(columns=['accuracy', 'roc'])
+df.loc['SGD'] = [0.79, 0.72] #SGD
+df.loc['SVC'] = [0.8, 0.73] #SVC
+df.loc['Gaussian NB'] = [0.66, 0.7] #GNB
+df.loc['Soft Voting'] = [0.77, 0.74] #Soft
+df.loc['Hard Voting'] = [0.8, 0.73] #Hard
+df.loc['Logistic Ref.'] = [0.8, 0.72] #Logistic
+df.loc['RNN'] = [0.814, 0.75] #RNN
+df.loc['Decision Tree'] = [0, 0] #Tree
+df.loc['Random Forest'] = [0.72, 0.5] #RF
+df = df.sort_values(by='accuracy', ascending=False)
+accuracy = df['accuracy'].tolist()
+roc = df['roc'].tolist()
 
 # Set position of bar on X axis
 r1 = np.arange(len(accuracy))
@@ -36,7 +32,7 @@ plt.bar(r2, roc, color='#81F781', width=barWidth, edgecolor='white', label='roc'
 
 # Add xticks on the middle of the group bars
 plt.xlabel('group', fontweight='bold')
-plt.xticks([r + barWidth for r in range(len(accuracy))], ['SGD','SVC','Gaussian NB', 'Soft Voting', 'Hard Voting', 'Logistic Reg.', 'RNN', 'Decision Tree', 'Random Forest'])
+plt.xticks([r + barWidth for r in range(len(accuracy))], df.index.values)
 plt.xticks(rotation=60)
 
 #Labels
