@@ -234,26 +234,27 @@ if onlyNew == False:
     plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
-    plt.plot(datetime[0:95], price[0:95], alpha=0.5, color='b', label='Intraday auction')
-    plt.plot(datetime[0:95], price_dayahead[0:95], alpha=0.5, color='r', label='Day-ahead auction')
-    plt.setp(plt.xticks()[1], rotation=90, ha='left')
-    axes = plt.gca()
-    axes.set_ylim([-150, 200])
-    plt.ylabel('Price (Euro/MWh)')
-    plt.title('Price comparison over one day')
-    plt.legend(loc=0)
-    plt.gcf().subplots_adjust(bottom=0.15)
-    plt.ylim([0, 50])
-    outputPath = output + 'pricesOneDay.png'
-    plt.savefig(outputPath, transparent=True, dpi=resolution)
-    plt.close()
-
     # intraday price autocorrelation
     plt.figure()
     autocorrelation_plot(price, color=color)
     outputPath = output + 'price_intraday_autocorrelation.png'
     plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
+
+#Price comparison over one day
+plt.plot(datetime[0:95], price[0:95], alpha=0.5, color='#6D9EEB', label='Intraday auction')
+plt.plot(datetime[0:95], price_dayahead[0:95], alpha=0.5, color='#F35B69', label='Day-ahead auction')
+plt.setp(plt.xticks()[1], rotation=90, ha='left')
+axes = plt.gca()
+axes.set_ylim([-150, 200])
+plt.ylabel('Price (Euro/MWh)')
+plt.title('Price comparison over one day')
+plt.legend(loc=0)
+plt.gcf().subplots_adjust(bottom=0.15)
+plt.ylim([0, 50])
+outputPath = output + 'pricesOneDay.png'
+plt.savefig(outputPath, transparent=True, dpi=resolution)
+plt.close()
 
 
 # normal plots
