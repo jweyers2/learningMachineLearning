@@ -21,4 +21,4 @@ plt.gcf().subplots_adjust(top=0.55)
 
 #plt.show()
 
-plt.savefig('../00 Data/Figures/correlations.png')
+plt.savefig('../00 Data/Figures/correlations.png', dpi=600)

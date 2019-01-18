@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+import datetime as dt
 from pandas.plotting import autocorrelation_plot
 
 binarypath = '../00 Data/Final/binaryFinal.csv'
@@ -13,7 +14,7 @@ dataframe = pd.read_csv(path, dayfirst=True)
 dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
 datetime = dataframe['datetime']
 
-onlyNew = False
+onlyNew = True
 
 price = dataframe['price']
 price_dayahead = dataframe['price_dayahead']
@@ -32,49 +33,58 @@ numberRainyDays = dataframe['numberRainyDays']
 dailySunnyHoursAvg = dataframe['dailySunnyHoursAvg']
 monthlyWindSpeedAvg = dataframe['monthlyWindSpeedAvg(km/h)']
 
+output = '../00 Data/FiguresPresentation/'
+resolution = 600
+plt.style.use('dark_background')
+color = '#39BFB9'
+
 if onlyNew == False:
     # intraday price autocorrelation
     plt.figure()
-    autocorrelation_plot(price)
-    plt.savefig('../00 Data/Figures/price_intraday_autocorrelation.png')
+    autocorrelation_plot(price, color=color)
+    outputPath = output + 'price_intraday_autocorrelation.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # day ahead price autocorrelation
     plt.figure()
-    autocorrelation_plot(price_dayahead)
-    plt.savefig('../00 Data/Figures/price_dayahead_autocorrelation.png')
+    autocorrelation_plot(price_dayahead, color=color)
+    outputPath = output + 'price_dayahead_autocorrelation.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # price premium autocorrelation
     plt.figure()
-    autocorrelation_plot(price_premium)
-    plt.savefig('../00 Data/Figures/price_premium_autocorrelation.png')
+    autocorrelation_plot(price_premium, color=color)
+    outputPath = output + 'price_premium_autocorrelation.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # categorical price premium autocorrelation
     plt.figure()
-    autocorrelation_plot(cat_price_premium)
-    plt.savefig('../00 Data/Figures/price_premium_cat_autocorrelation.png')
+    autocorrelation_plot(cat_price_premium, color=color)
+    outputPath = output + 'price_premium_cat_autocorrelation.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # intraday price
-    plt.plot(datetime, price)
+    plt.plot(datetime, price, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Price (€/MWh)')
     plt.title('Intraday auction price history')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/price_intraday.png')
+    outputPath = output + 'price_intraday.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # day ahead price
-    plt.plot(datetime, price_dayahead)
+    plt.plot(datetime, price_dayahead, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Price (?/MWh)')
     plt.title('Day-ahead auction price history')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/price_dayahead.png')
+    outputPath = output + 'price_dayahead.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # price comparison
@@ -87,41 +97,41 @@ if onlyNew == False:
     plt.title('Price comparison')
     plt.legend(loc=0)
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/prices.png')
+    outputPath = output + 'prices.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # participants
-    plt.plot(datetime, participants)
+    plt.plot(datetime, participants, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Number of market participants')
     plt.title('Market participation history')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/participants.png')
+    outputPath = output + 'participants.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # intraday consumption
-    plt.plot(datetime, intraday_consumption)
+    plt.plot(datetime, intraday_consumption, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Consumption (MWh)')
     plt.title('Intraday auction energy consumption in 15 minute time frames')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/consumption_intraday.png')
+    outputPath = output + 'consumption_intraday.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # day ahead consumption
-    plt.plot(datetime, dayahead_consumption)
+    plt.plot(datetime, dayahead_consumption, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Consumption (MWh)')
     plt.title('Day-ahead auction energy consumption in 15 minute time frames')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/consumption_dayahead.png')
+    outputPath = output + 'consumption_dayahead.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
-    # price comparison
+    # consumption comparison
     plt.plot(datetime, intraday_consumption, alpha=0.5, color='b', label='Intraday auction')
     plt.plot(datetime, dayahead_consumption, alpha=0.5, color='r', label='Day-ahead auction')
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
@@ -131,8 +141,8 @@ if onlyNew == False:
     plt.title('Energy consumption comparison in 15 minute time frames')
     plt.legend(loc=0)
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/consumption.png')
+    outputPath = output + 'consumption.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # temperature
@@ -146,8 +156,8 @@ if onlyNew == False:
     plt.title('Temperature of an average day per month')
     plt.legend(loc=0)
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/temperature.png')
+    outputPath = output + 'temperature.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # cold days
@@ -160,68 +170,89 @@ if onlyNew == False:
     plt.title('Number of cold days per month')
     plt.legend(loc=0)
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/cold_days.png')
+    outputPath = output + 'cold_days.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # rain volume
-    plt.plot(datetime, monthlyRainVolume)
+    plt.plot(datetime, monthlyRainVolume, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Rain volume (mm)')
     plt.title('Monthly rain volume')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/rain_volume.png')
+    outputPath = output + 'rain_volume.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # rainy days count
-    plt.plot(datetime, numberRainyDays)
+    plt.plot(datetime, numberRainyDays, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Number of rainy days')
     plt.title('Number of rainy days per month')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/rainy_day_count.png')
+    outputPath = output + 'rainy_day_count.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # sunny hours
-    plt.plot(datetime, dailySunnyHoursAvg)
+    plt.plot(datetime, dailySunnyHoursAvg, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Number of sunny hours')
     plt.title('Amount of sunny hours on an average day per month')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/sunny_hours.png')
+    outputPath = output + 'sunny_hours.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # sunny hours
-    plt.plot(datetime, monthlyWindSpeedAvg)
+    plt.plot(datetime, monthlyWindSpeedAvg, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Wind speed (km/h)')
     plt.title('Average wind speed per month')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/wind_speed.png')
+    outputPath = output + 'wind_speed.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # day ahead consumption in points
-    plt.plot(datetime, dayahead_consumption, 'o', markersize=0.5)
+    plt.plot(datetime, dayahead_consumption, 'o', markersize=0.5, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Consumption (MWh)')
     plt.title('Day-ahead auction energy consumption in 15 minute time frames')
     plt.gcf().subplots_adjust(bottom=0.15)
-
-    plt.savefig('../00 Data/Figures/consumption_dayahead_points.png')
+    outputPath = output + 'consumption_dayahead_points.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
     # intraday consumption with points
-    plt.plot(datetime, intraday_consumption, 'o', markersize=0.5)
+    plt.plot(datetime, intraday_consumption, 'o', markersize=0.5, color=color)
     plt.setp(plt.xticks()[1], rotation=90, ha='left')
     plt.ylabel('Consumption (MWh)')
     plt.title('Intraday auction energy consumption in 15 minute time frames')
     plt.gcf().subplots_adjust(bottom=0.15)
+    outputPath = output + 'consumption_intraday_points.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
+    plt.close()
 
-    plt.savefig('../00 Data/Figures/consumption_intraday_points.png')
+    plt.plot(datetime[0:95], price[0:95], alpha=0.5, color='b', label='Intraday auction')
+    plt.plot(datetime[0:95], price_dayahead[0:95], alpha=0.5, color='r', label='Day-ahead auction')
+    plt.setp(plt.xticks()[1], rotation=90, ha='left')
+    axes = plt.gca()
+    axes.set_ylim([-150, 200])
+    plt.ylabel('Price (Euro/MWh)')
+    plt.title('Price comparison over one day')
+    plt.legend(loc=0)
+    plt.gcf().subplots_adjust(bottom=0.15)
+    plt.ylim([0, 50])
+    outputPath = output + 'pricesOneDay.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
+    plt.close()
+
+    # intraday price autocorrelation
+    plt.figure()
+    autocorrelation_plot(price, color=color)
+    outputPath = output + 'price_intraday_autocorrelation.png'
+    plt.savefig(outputPath, transparent=True, dpi=resolution)
     plt.close()
 
 
