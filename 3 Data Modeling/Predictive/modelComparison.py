@@ -11,7 +11,7 @@ df = pd.DataFrame(columns=['accuracy', 'roc'])
 df.loc['SGD'] = [0.79, 0.72] #SGD
 df.loc['SVC'] = [0.8, 0.73] #SVC
 df.loc['Gaussian NB'] = [0.66, 0.7] #GNB
-df.loc['Soft Voting'] = [0.77, 0.74] #Soft
+df.loc['Soft Voting'] = [0.78, 0.75] #Soft
 df.loc['Hard Voting'] = [0.8, 0.73] #Hard
 df.loc['Logistic Ref.'] = [0.8, 0.72] #Logistic
 df.loc['RNN'] = [0.814, 0.75] #RNN

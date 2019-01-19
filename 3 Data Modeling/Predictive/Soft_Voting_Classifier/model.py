@@ -9,6 +9,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
+from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
@@ -28,8 +29,8 @@ else:
     path = '../../../00 Data/Final/binaryScaled.csv'
 X_train, X_test, y_train, y_test = train_test_split_predictive(path)
 dataframe = pd.read_csv(path, dayfirst=True)
-tscv = TimeSeriesSplit(n_splits=int(y_test.size/(96)))
-# tscv = TimeSeriesSplit(n_splits=int(25))
+# tscv = TimeSeriesSplit(n_splits=int(y_test.size/(96)))
+tscv = TimeSeriesSplit(n_splits=int(25))
 print('Total splits = '+str(tscv.n_splits))
 totalpred = []
 totaltrue = []
@@ -38,8 +39,9 @@ totalprob = []
 clf1 = SGDClassifier(loss='log', penalty='elasticnet', max_iter=100, tol=0.001)
 clf2 = DecisionTreeClassifier(min_samples_leaf=500, max_depth=5, min_impurity_decrease=0.005, random_state=1)
 clf3 = LogisticRegression(penalty='l1',C=1,solver='liblinear')
+clf4 = svm.SVC(C=1,kernel='rbf',gamma='auto',probability=True)
 clf5 = GaussianNB()
-clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('gnb',clf5)],voting='soft')
+clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svc',clf4),('gnb',clf5)],voting='soft')
 
 counter = 0
 
@@ -53,7 +55,7 @@ for train_index, test_index in tscv.split(X_test):
         X_test_test = X_test[:train_index.size]
         y_test_test = y_test[:train_index.size]
         firstIteration = False
-        clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('gnb',clf5)],voting='soft')
+        clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svc',clf4),('gnb',clf5)],voting='soft')
         clf.fit(X_test_train, y_test_train)
         y_proba = clf.predict_proba(X_test_test)
         totalprob.extend(y_proba[:, 1])
@@ -65,7 +67,7 @@ for train_index, test_index in tscv.split(X_test):
     print(str(datetime.datetime.now()) + ' | ' + str(counter))
     X_test_train, X_test_test = numpy.vstack([X_train, X_test[:train_index.size]]), X_test[train_index.size:train_index.size + test_index.size]
     y_test_train, y_test_test = y_train.append(y_test[:train_index.size]), y_test[train_index.size:train_index.size + test_index.size]
-    clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('gnb',clf5)],voting='soft')
+    clf = VotingClassifier(estimators=[('sgd',clf1),('tree',clf2),('logreg',clf3),('svc',clf4),('gnb',clf5)],voting='soft')
     clf.fit(X_test_train, y_test_train)
     y_proba = clf.predict_proba(X_test_test)
     totalprob.extend(y_proba[:, 1])
