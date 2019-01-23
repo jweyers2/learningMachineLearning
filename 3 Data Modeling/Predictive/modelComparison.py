@@ -5,6 +5,7 @@ import pandas as pd
 
 # set width of bar
 barWidth = 0.25
+resolution = 600
 
 #results for prediction analysis
 df = pd.DataFrame(columns=['accuracy', 'roc'])
@@ -15,7 +16,7 @@ df.loc['Soft Voting'] = [0.78, 0.75] #Soft
 df.loc['Hard Voting'] = [0.8, 0.73] #Hard
 df.loc['Logistic Ref.'] = [0.8, 0.72] #Logistic
 df.loc['RNN'] = [0.814, 0.75] #RNN
-df.loc['Decision Tree'] = [0, 0] #Tree
+df.loc['Decision Tree'] = [0.78, 0.8] #Tree
 df.loc['Random Forest'] = [0.72, 0.5] #RF
 df = df.sort_values(by='accuracy', ascending=False)
 accuracy = df['accuracy'].tolist()
@@ -26,9 +27,11 @@ r1 = np.arange(len(accuracy))
 r2 = [x + barWidth for x in r1]
 r3 = [x + barWidth for x in r2]
 
+#plt.style.use('dark_background')
+
 # Make the plot
-plt.bar(r1, accuracy, color='#FE2E2E', width=barWidth, edgecolor='white', label='accuracy')
-plt.bar(r2, roc, color='#81F781', width=barWidth, edgecolor='white', label='roc')
+plt.bar(r1, accuracy, color='#6D9EEB', width=barWidth, edgecolor='black', label='accuracy')
+plt.bar(r2, roc, color='#F35B69', width=barWidth, edgecolor='black', label='roc')
 
 # Add xticks on the middle of the group bars
 plt.xlabel('group', fontweight='bold')
@@ -49,6 +52,6 @@ axes = plt.gca()
 axes.set_ylim([0, 1])
 
 #set y axis
-plt.ylim([0.4, 1])
+plt.ylim([0, 1])
 
-plt.savefig('./modelComparision.png')
+plt.savefig('./modelComparision.png', transparent=True, dpi=resolution)
