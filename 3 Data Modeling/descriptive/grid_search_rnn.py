@@ -37,13 +37,13 @@ dataframe = dataframe.ix[:, cols]
 values= dataframe.values
 
 # Function to create model, required for KerasClassifier
-def create_model(dropout_rate=0.0, weight_constraint=0):
+def create_model():
     model = Sequential()
     model.add(LSTM(100, input_dim=71))
-    model.add(Dense(100, kernel_initializer='normal', activation='relu',kernel_constraint=maxnorm(weight_constraint)))
-    model.add(Dropout(dropout_rate))
-    model.add(Dense(200, kernel_initializer='normal', activation='relu',kernel_constraint=maxnorm(weight_constraint)))
-    model.add(Dropout(dropout_rate))
+    model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
+    model.add(Dropout(0.3))
+    model.add(Dense(150, activation='relu', kernel_constraint=maxnorm(3)))
+    model.add(Dropout(0.3))
     model.add(Dense(1, activation='sigmoid'))
     optimizer = SGD(lr=0.1, momentum=0.0)
     model.compile(loss='binary_crossentropy', optimizer='Adamax', metrics=['accuracy'])
@@ -99,11 +99,11 @@ Y = reframed_values[:,72]
 
 X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
 
-model = KerasClassifier(build_fn=create_model, epochs=100, batch_size=10, verbose=0)
+model = KerasClassifier(build_fn=create_model, verbose=0)
 # define the grid search parameters
-weight_constraint = [1, 2, 3, 4, 5]
-dropout_rate = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-param_grid = dict(dropout_rate=dropout_rate, weight_constraint=weight_constraint)
+batch_size = [70,75,80,85,90]
+epochs = [10,13,16,19,23]
+param_grid = dict(batch_size=batch_size, epochs=epochs)
 grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1, cv=10)
 grid_result = grid.fit(X, Y)
 # summarize results

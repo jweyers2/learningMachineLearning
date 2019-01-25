@@ -22,6 +22,7 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 import seaborn as sns
+from keras.constraints import maxnorm
 
 
 
@@ -109,23 +110,28 @@ print(train_y)
 """
 y_pred_list= []
 y_true_list=[]
+y_proba=[]
 for train, test in kfold.split(X, Y):
     # design network
     model = Sequential()
     model.add(LSTM(100,input_dim=71))
-    model.add(Dense(100, kernel_initializer='normal', activation='relu'))
-    model.add(Dense(200, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(100, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
+    model.add(Dropout(0.3))
+    model.add(Dense(150, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
+    model.add(Dropout(0.3))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='adam',metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer='Adamax',metrics=['accuracy'])
     # fit network
-    model.fit(X[train], Y[train], epochs=17, batch_size=128, verbose=2,shuffle=False)
+    model.fit(X[train], Y[train], epochs=19, batch_size=85, verbose=2,shuffle=False)
     # evaluate the model
     scores = model.evaluate(X[test], Y[test], verbose=0)
     print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     cvscores.append(scores[1] * 100)
     y_pred = model.predict(X[test])
+    y_probabilities= model.predict_proba(X[test])
     y_pred_list.append(list(y_pred))
     y_true_list.append(list(Y[test]))
+    y_proba.append(y_probabilities)
     """
     cm = confusion_matrix(Y[test], y_pred)
     print("True Positives: ", cm[0][0])
@@ -142,6 +148,8 @@ flat_y_true_list = [x for sublist in y_true_list for x in sublist]
 print(y_pred_list)
 flat_y_pred_list = [x for sublist in y_pred_list for x in sublist]
 final_y_pred_list=[]
+
+flat_y_proba_list = [x for sublist in y_proba for x in sublist]
 
 for values in flat_y_pred_list:
     if values > 0.5:
@@ -174,7 +182,7 @@ plt.close()
 fpr, tpr, _ = roc_curve(flat_y_true_list, final_y_pred_list)
 score = roc_auc_score(flat_y_true_list, final_y_pred_list)
 plt.plot(fpr,tpr,label="ROC prediction score ("+str(round(score,2))+")")
-fpr2, tpr2, _2 = roc_curve(flat_y_true_list, final_y_pred_list)
+fpr2, tpr2, _2 = roc_curve(flat_y_true_list, flat_y_proba_list)
 plt.plot(fpr2, tpr2, label="ROC probability score")
 plt.plot([0, 1],[0,1], 'k--')
 plt.axis([0,1,0,1])
