@@ -15,6 +15,10 @@ plt.xticks(rotation=90)
 ax.set_yticks(ticks)
 ax.set_xticklabels(data.columns)
 ax.set_yticklabels(data.columns)
+
+#make op bigger for displaying whole labels
+plt.gcf().subplots_adjust(top=0.55)
+
 #plt.show()
 
-plt.savefig('../00 Data/Figures/correlations.png')
+plt.savefig('../00 Data/Figures/correlations.png', dpi=600)

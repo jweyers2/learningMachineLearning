@@ -5,6 +5,7 @@ import numpy as np
 
 path = '../../00 Data/Final/cleanFinal.csv'
 path_julijan = '../../00 Data/Final/binaryScaled.csv'
+# path_julijan = '../../00 Data/Final/binaryFinal.csv'
 OUTPUT_PATH = 'decisionTree.png'
 df = pd.read_csv(path,sep=',')
 df_julijan = pd.read_csv(path_julijan,sep=',')
@@ -139,6 +140,7 @@ def treeToRules(tree, feature_names,target_names=['1','0'],threshold= 0):
 def main():
     from sklearn.metrics import accuracy_score
     from sklearn.metrics import confusion_matrix
+    from sklearn.metrics import roc_auc_score
     # features = ['dailyTempAvg(Celsius)', 'numberIcyDays', 'numberFreezingDays', 'monthlyRainVolume(mm)', 'numberRainyDays',
     #      'dailySunnyHoursAvg', 'monthlyWindSpeedAvg(km/h)', 'holidayBefore', 'holidayAfter', 'isHoliday',
     #      'participants']
@@ -168,7 +170,19 @@ def main():
     fitted_tree,cv_results = decisionTree(X,y,features,OUTPUT_PATH)
     pred = fitted_tree.predict(X)
     print("accuracy: " + str(accuracy_score(y,pred)))
-    print(confusion_matrix(y,pred))
+    results = []
+    results.append(accuracy_score(y,pred))
+    print(confusion_matrix(y, pred))
+    pred = fitted_tree.predict_proba(X)
+    pred_df = pd.DataFrame(pred)
+    print(pred_df)
+    print("roc: " + str(roc_auc_score(y,pred_df.iloc[:,0])))
+    results.append(roc_auc_score(y,pred_df.iloc[:,0]))
+    result_df = pd.DataFrame().from_dict(results)
+    result_df['scores'] = ['accuracy','roc']
+    result_df.to_csv("tree_model_evaluation.csv")
+
+
     # rules = treeToRules(fitted_tree,features,target_names=['positive','negative'],threshold=0.6)
     # for r in rules:
     #     print(''.join(r))
