@@ -31,14 +31,12 @@ out_path='../../00 Data/Final/prediction.csv'
 dataframe=pd.read_csv(path)
 print("Länge:", len(dataframe))
 dataframe.drop(['datetime'], axis=1, inplace=True)
-#print(min(dataframe['price_premium'].values))
-#dataframe = dataframe[['price_premium', 'price', 'consumption', 'dailyTempAvg(Celsius)','numberFreezingDays','numberIcyDays','monthlyRainVolume(mm)','numberRainyDays','dailySunnyHoursAvg','monthlyWindSpeedAvg(km/h)','price_dayahead','consumption_dayahead','holidayBefore','holidayAfter','isHoliday','participants']]
+dataframe.drop(['price_premium', 'price_dayahead', 'consumption_dayahead', 'price', 'consumption'],
+               axis=1, inplace=True)
 cols = list(dataframe)
 cols.insert(0, cols.pop(cols.index('cat_price_premium')))
 dataframe = dataframe.ix[:, cols]
 values= dataframe.values
-#print(values)
-#print(dataframe.columns)
 # fix random seed for reproducibility
 seed = 7
 np.random.seed(seed)
@@ -77,14 +75,18 @@ scaled = scaler.fit_transform(values)
 # frame as supervised learning
 reframed = series_to_supervised(scaled, 1, 1)
 # drop columns we don't want to predict
-reframed.drop(reframed.columns[list(range(73,144))], axis=1, inplace=True)
+reframed.drop(reframed.columns[list(range(68,134))], axis=1, inplace=True)
+reframed.drop(reframed.columns[0], axis=1, inplace=True)
 print(reframed.head())
 print(type(reframed))
+
 reframed_values= reframed.values
 
 # split into input (X) and output (Y) variables
-X = reframed_values[:,0:71]
-Y = reframed_values[:,72]
+X = reframed_values[:,0:65]
+Y = reframed_values[:,66]
+print(X)
+print(Y)
 
 X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
 #Y = np.reshape(Y, (Y.shape[0], 1, Y.shape[1]))
@@ -114,7 +116,7 @@ y_proba=[]
 for train, test in kfold.split(X, Y):
     # design network
     model = Sequential()
-    model.add(LSTM(100,input_dim=71))
+    model.add(LSTM(100,input_dim=65))
     model.add(Dense(100, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
     model.add(Dropout(0.3))
     model.add(Dense(150, kernel_initializer='normal', activation='relu', kernel_constraint=maxnorm(3)))
