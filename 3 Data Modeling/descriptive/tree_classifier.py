@@ -173,6 +173,8 @@ def main():
     results = []
     results.append(accuracy_score(y,pred))
     print(confusion_matrix(y, pred))
+    hits = pred == y
+    errors = pred != y
     pred = fitted_tree.predict_proba(X)
     pred_df = pd.DataFrame(pred)
     print(pred_df)
@@ -180,6 +182,7 @@ def main():
     results.append(roc_auc_score(y,pred_df.iloc[:,0]))
     result_df = pd.DataFrame().from_dict(results)
     result_df['scores'] = ['accuracy','roc']
+    result_df['expected profit per Mwh'] = pd.Series(hits*df_julijan['price_premium']).mean()
     result_df.to_csv("tree_model_evaluation.csv")
 
 
