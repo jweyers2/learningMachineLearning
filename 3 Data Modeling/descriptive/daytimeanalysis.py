@@ -14,6 +14,8 @@ print(type(dataframe.datetime))
 
 dataframe['datetime'] = pd.to_datetime(dataframe['datetime'])
 
+plt.style.use('dark_background')
+
 hour=[]
 day=[]
 month=[]
